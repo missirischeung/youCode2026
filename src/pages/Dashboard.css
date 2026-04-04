@@ -1,0 +1,9 @@
+.dashboard-page {
+    min-height: 100vh;
+    background: #f8f9fa;
+  }
+  
+  .dashboard-card {
+    border-radius: 12px;
+    border: none;
+  }

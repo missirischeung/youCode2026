@@ -1,0 +1,10 @@
+.profile-page {
+    min-height: 100vh;
+    background: #f8f9fa;
+  }
+  
+  .profile-card {
+    max-width: 500px;
+    border-radius: 12px;
+    border: none;
+  }

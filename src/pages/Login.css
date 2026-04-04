@@ -1,0 +1,10 @@
+.login-page {
+    min-height: 100vh;
+    background: #f8f9fa;
+  }
+  
+  .login-card {
+    border-radius: 12px;
+    border: none;
+    padding: 1rem;
+  }
