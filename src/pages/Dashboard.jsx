@@ -1,24 +1,29 @@
-import { Container, Row, Col } from 'react-bootstrap'
+import { Container } from 'react-bootstrap'
 import OpportunityCard from '../components/OpportunityCard'
 import opportunities from '../data/opportunities'
 import './Dashboard.css'
 
-function Dashboard() {
+function Dashboard({ onCommit, committedIds = [] }) {
   return (
     <div className="dashboard-page">
       <Container className="py-5">
-        <h1 className="mb-2">Opportunities for You</h1>
-        <p className="mb-4 dashboard-subtitle">
+        <h1 className="dashboard-title">Opportunities for You</h1>
+
+        <p className="dashboard-subtitle">
           Explore supportive ways to build skills, contribute, and grow confidence.
         </p>
 
-        <Row className="g-4">
+        {/* 🔥 THIS is what makes them rows */}
+        <div className="opportunity-list">
           {opportunities.map((opportunity) => (
-            <Col key={opportunity.id} xs={12} md={6} xl={4}>
-              <OpportunityCard {...opportunity} />
-            </Col>
+            <OpportunityCard
+              key={opportunity.id}
+              {...opportunity}
+              onCommit={onCommit}
+              isCommitted={committedIds.includes(opportunity.id)}
+            />
           ))}
-        </Row>
+        </div>
       </Container>
     </div>
   )

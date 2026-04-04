@@ -3,7 +3,38 @@
     background: #f8f9fa;
   }
   
-  .dashboard-card {
-    border-radius: 12px;
-    border: none;
+  .dashboard-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #3f4b46;
+    margin-bottom: 0.5rem;
+  }
+  
+  .dashboard-subtitle {
+    color: #5f6b7a;
+    font-size: 1.05rem;
+    margin-bottom: 2rem;
+    max-width: 700px;
+  }
+  
+  /* 🔥 THIS is the important part */
+  .opportunity-list {
+    display: flex;
+    flex-direction: column;  /* stack vertically */
+    gap: 16px;              /* space between cards */
+  }
+  
+  /* Optional: slightly tighter spacing on smaller screens */
+  @media (max-width: 768px) {
+    .dashboard-title {
+      font-size: 1.6rem;
+    }
+  
+    .dashboard-subtitle {
+      font-size: 0.95rem;
+    }
+  
+    .opportunity-list {
+      gap: 12px;
+    }
   }
