@@ -1,32 +1,24 @@
-import { Container, Row, Col, Card } from 'react-bootstrap'
+import { Container, Row, Col } from 'react-bootstrap'
+import OpportunityCard from '../components/OpportunityCard'
+import opportunities from '../data/opportunities'
 import './Dashboard.css'
 
 function Dashboard() {
   return (
     <div className="dashboard-page">
       <Container className="py-5">
-        <h1 className="mb-4">Dashboard</h1>
+        <h1 className="mb-2">Opportunities for You</h1>
+        <p className="mb-4 dashboard-subtitle">
+          Explore supportive ways to build skills, contribute, and grow confidence.
+        </p>
 
         <Row className="g-4">
-          <Col md={6} lg={4}>
-            <Card className="dashboard-card">
-              <Card.Body>
-                <h5>Card 1</h5>
-                <p>Some content here</p>
-              </Card.Body>
-            </Card>
-          </Col>
-
-          <Col md={6} lg={4}>
-            <Card className="dashboard-card">
-              <Card.Body>
-                <h5>Card 2</h5>
-                <p>More content</p>
-              </Card.Body>
-            </Card>
-          </Col>
+          {opportunities.map((opportunity) => (
+            <Col key={opportunity.id} xs={12} md={6} xl={4}>
+              <OpportunityCard {...opportunity} />
+            </Col>
+          ))}
         </Row>
-
       </Container>
     </div>
   )
