@@ -53,7 +53,7 @@ function Login() {
                         <div className="login-brand-logo">
                             <LogoPlaceholder />
                         </div>
-                        <span className="login-brand-name">Foursight</span>
+                        <span className="login-brand-name">ForHer</span>
                     </div>
 
                     {/* Hero copy */}
