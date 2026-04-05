@@ -24,6 +24,16 @@
     gap: 16px;              /* space between cards */
   }
   
+  .opportunity-modal .modal-content {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+  }
+  
+  .opportunity-modal-body {
+    padding: 0 !important;
+  }
+
   /* Optional: slightly tighter spacing on smaller screens */
   @media (max-width: 768px) {
     .dashboard-title {

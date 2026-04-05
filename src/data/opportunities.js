@@ -1,118 +1,49 @@
-// const opportunities = [
-//     {
-//       id: 1,
-//       title: 'Volunteer Companion',
-//       organization: 'Sunrise Senior Living',
-//       description:
-//         'Assist residents at a nursing home by engaging in reading activities, helping with light group exercise activities, and offering social interaction.',
-//       location: '999 West 57th Avenue',
-  
-//       // must be 1 / 2 / 3 for your current card component
-//       effortLevel: 1,
-  
-//       schedule: '2–4pm Mon/Wed/Fri',
-//       skills: ['Communication', 'Event Support', 'Teamwork', 'Caregiving'],
-//       beginnerFriendly: true,
-  
-//       impact: 'Helps residents feel less isolated and more socially connected.',
-//       whyItHelps:
-//         'A gentle first step for building confidence, routine, and comfort interacting with others.',
-//       timeCommitment: '1–2 hours',
-//       cost: 'Free',
-//       transitSupport: 'Transit details available',
-//       barrierSupport: 'Staff guidance available when arriving for the first time.',
-//       nextStepLabel: 'Try this step',
-//     },
-//     {
-//       id: 2,
-//       title: 'Literacy Volunteer',
-//       organization: 'ONE TO ONE Literacy Society',
-//       description:
-//         'Support children in developing foundational reading and writing skills by assisting with homework, reading aloud, and simple writing exercises.',
-//       location: '610 Main St, Vancouver, BC V6A 2V3',
-  
-//       effortLevel: 2,
-  
-//       schedule: 'Weekend Afternoons',
-//       skills: [
-//         'Teaching',
-//         'Patience',
-//         'Empathy',
-//         'Organization',
-//         'Mentorship',
-//         'Problem-Solving',
-//       ],
-//       beginnerFriendly: true,
-  
-//       impact: 'Supports children in building confidence and stronger literacy skills.',
-//       whyItHelps:
-//         'Builds responsibility, communication, and mentoring experience in a meaningful way.',
-//       timeCommitment: '2–3 hours',
-//       cost: 'Free',
-//       transitSupport: 'Transit details available',
-//       barrierSupport: 'Clear instructions and support provided before the first session.',
-//       nextStepLabel: 'Explore this role',
-//     },
-//     {
-//       id: 3,
-//       title: 'Food Assistance Volunteer',
-//       organization: 'Greater Vancouver Food Bank',
-//       description:
-//         'Help prepare, organize, and distribute food to community members in need.',
-//       location: '8345 Winston St., Burnaby, BC',
-  
-//       effortLevel: 3,
-  
-//       schedule: 'Weekdays 3–6pm',
-//       skills: [
-//         'Customer Service',
-//         'Food Handling & Safety',
-//         'Time Management',
-//         'Teamwork',
-//         'Problem-Solving',
-//       ],
-//       beginnerFriendly: false,
-  
-//       impact: 'Helps community members access food and basic support reliably.',
-//       whyItHelps:
-//         'A stronger next step for building routine, teamwork, and confidence in a more active role.',
-//       timeCommitment: '3 hours',
-//       cost: 'Free',
-//       transitSupport: 'Transit details available',
-//       barrierSupport: 'Arrival info and volunteer expectations shared ahead of time.',
-//       nextStepLabel: 'Take the next step',
-//     },
-//   ]
-  
-//   export default opportunities
-
 const opportunities = [
     {
       id: 1,
-      title: 'Volunteer Companion',
-      organization: 'Sunrise Senior Living',
+      title: 'Community Kitchen Drop-In',
+      organization: 'Sunrise Community Centre',
       description:
-        'Spend time reading, chatting, and helping with light group activities. A gentle way to get out, connect, and build comfort around others.',
-      location: '999 West 57th Avenue',
+        'Help prep vegetables, set tables, and share a meal with a small group. No cooking experience needed.',
+      location: 'East Vancouver',
       effortLevel: 1,
-      schedule: '2–4pm Mon/Wed/Fri',
-      skills: ['Communication', 'Event Support', 'Teamwork', 'Caregiving'],
-      beginnerFriendly: true,
-      impact: 'Helps residents feel seen, supported, and less alone.',
-      whyItHelps:
-        'A low-pressure first step for building confidence, routine, and social comfort.',
-      timeCommitment: '1–2 hrs',
+      schedule: 'Every Tuesday',
+      timeCommitment: '10am – 12pm',
       cost: 'Free',
-      transitSupport: '12 min by bus',
-      barrierSupport: [
-        'Staff can greet you when you arrive',
-        'No experience needed',
-        'You can start by observing',
-      ],
-      tags: ['Solo ok', 'Quiet', 'First-time friendly'],
-      builds: ['Confidence', 'Social skills'],
+      transitSupport: 'Bus #20, 12 min',
+      beginnerFriendly: true,
+      impact: 'Helps feed 40+ neighbours each week',
+      whyItHelps:
+        'A low-pressure way to be around people again — no sign-up, no commitment, just show up when you feel ready.',
+      barrierSupport: ['Drop-in, no sign-up', 'Bring nothing'],
+      tags: ['Kids welcome', 'OK to come alone', 'Quiet, small group', 'Free'],
+      builds: ['Cooking basics', 'Teamwork', 'Confidence'],
+      skills: ['Cooking basics', 'Teamwork', 'Confidence'],
+      nextStepLabel: "I'm in",
+    },
+  
+    {
+      id: 2,
+      title: 'Garden Help Hour',
+      organization: 'Neighbourhood Food Hub',
+      description:
+        'Water plants, sort herbs, and help tidy the garden beds with a friendly team outdoors.',
+      location: 'Mount Pleasant',
+      effortLevel: 2,
+      schedule: 'Saturday mornings',
+      timeCommitment: '1 hr',
+      cost: 'Free',
+      transitSupport: 'Near Broadway-City Hall',
+      beginnerFriendly: true,
+      impact: 'Supports fresh produce for local families',
+      whyItHelps:
+        'A gentle way to ease into volunteering with clear tasks and fresh air.',
+      barrierSupport: ['Drop-in welcome'],
+      tags: ['OK to come alone', 'Quiet, small group', 'Free'],
+      builds: ['Routine', 'Confidence', 'Responsibility'],
+      skills: ['Gardening basics', 'Teamwork'],
       nextStepLabel: "I'm in",
     },
   ]
-
+  
   export default opportunities
