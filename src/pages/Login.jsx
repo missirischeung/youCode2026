@@ -1,8 +1,22 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router'
-import { Container, Row, Col, Form, Button, Card } from 'react-bootstrap'
+import { Form, Button } from 'react-bootstrap'
 import { supabase } from '../supabaseClient'
 import './Login.css'
+
+// Placeholder logo icon — replace with your actual logo later
+function LogoPlaceholder() {
+    return (
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="10" cy="10" r="8" stroke="rgba(255,255,255,0.85)" strokeWidth="1.8" />
+            <circle cx="10" cy="10" r="3" fill="rgba(255,255,255,0.85)" />
+            <line x1="10" y1="2" x2="10" y2="6" stroke="rgba(255,255,255,0.7)" strokeWidth="1.6" strokeLinecap="round" />
+            <line x1="10" y1="14" x2="10" y2="18" stroke="rgba(255,255,255,0.7)" strokeWidth="1.6" strokeLinecap="round" />
+            <line x1="2" y1="10" x2="6" y2="10" stroke="rgba(255,255,255,0.7)" strokeWidth="1.6" strokeLinecap="round" />
+            <line x1="14" y1="10" x2="18" y2="10" stroke="rgba(255,255,255,0.7)" strokeWidth="1.6" strokeLinecap="round" />
+        </svg>
+    )
+}
 
 function Login() {
     const [email, setEmail] = useState('')
@@ -29,70 +43,106 @@ function Login() {
 
     return (
         <div className="login-page">
-            <Container className="login-container">
-                <Row className="justify-content-center align-items-center min-vh-100">
-                    <Col xs={12} md={10} lg={6} xl={5}>
-                        <Card className="login-card shadow-sm">
-                            <Card.Body className="p-4 p-md-5">
-                                <div className="login-badge">FourSight</div>
+            <div className="login-card-outer">
 
-                                <h1 className="login-title">
-                                    Welcome back
-                                </h1>
+                {/* ── Left: gradient panel ── */}
+                <div className="login-left">
 
-                                <p className="login-subtitle">
-                                    A space to explore strengths, build confidence, and grow through meaningful opportunities.
-                                </p>
+                    {/* Logo + wordmark */}
+                    <div className="login-brand">
+                        <div className="login-brand-logo">
+                            <LogoPlaceholder />
+                        </div>
+                        <span className="login-brand-name">Foursight</span>
+                    </div>
 
-                                {error && (
-                                    <div className="alert alert-danger py-2 mt-3" role="alert">
-                                        {error}
-                                    </div>
-                                )}
+                    {/* Hero copy */}
+                    <div className="login-left-body">
+                        <h1 className="login-hero-headline">
+                            Wellbeing that meets you <em>where you are.</em>
+                        </h1>
+                        <p className="login-hero-sub">
+                            Foursight helps women in shelters build confidence, find community,
+                            and take small steps toward a life that feels like their own.
+                        </p>
+                    </div>
 
-                                <Form className="mt-4" onSubmit={handleLogin}>
-                                    <Form.Group className="mb-3" controlId="loginEmail">
-                                        <Form.Label className="login-label">Email</Form.Label>
-                                        <Form.Control
-                                            type="email"
-                                            placeholder="Enter your email"
-                                            className="login-input"
-                                            value={email}
-                                            onChange={(e) => setEmail(e.target.value)}
-                                            required
-                                        />
-                                    </Form.Group>
+                    {/* Quote */}
+                    <div className="login-quote-card">
+                        <p className="login-quote-text">
+                            "There is no limit to what we, as women, can accomplish.."
+                        </p>
+                        <p className="login-quote-attr">-Michelle Obama</p>
+                    </div>
+                </div>
 
-                                    <Form.Group className="mb-3" controlId="loginPassword">
-                                        <Form.Label className="login-label">Password</Form.Label>
-                                        <Form.Control
-                                            type="password"
-                                            placeholder="Enter your password"
-                                            className="login-input"
-                                            value={password}
-                                            onChange={(e) => setPassword(e.target.value)}
-                                            required
-                                        />
-                                    </Form.Group>
+                {/* ── Right: form panel ── */}
+                <div className="login-right">
+                    <div className="login-form-wrap">
+                        <p className="login-form-kicker">Welcome back</p>
+                        <h2 className="login-form-title">Log in to your account</h2>
+                        <p className="login-form-sub">Pick up right where you left off.</p>
 
-                                    <div className="login-links mb-4">
-                                        <a href="#" className="login-link">Forgot password?</a>
-                                    </div>
+                        {error && (
+                            <div
+                                className="alert py-2 mb-3"
+                                role="alert"
+                                style={{
+                                    borderRadius: 12,
+                                    border: 'none',
+                                    background: '#fff1f4',
+                                    color: '#b14d6d',
+                                    fontSize: '0.88rem',
+                                }}
+                            >
+                                {error}
+                            </div>
+                        )}
 
-                                    <Button className="login-button w-100" type="submit" disabled={loading}>
-                                        {loading ? 'Logging in…' : 'Log In'}
-                                    </Button>
-                                </Form>
+                        <Form onSubmit={handleLogin}>
+                            <Form.Group className="mb-3">
+                                <label className="login-label">Email</label>
+                                <input
+                                    type="email"
+                                    className="login-input"
+                                    placeholder="you@example.com"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    required
+                                />
+                            </Form.Group>
 
-                                <div className="login-footer mt-4">
-                                    <span>New here?</span>{' '}
-                                    <Link to="/signup" className="login-link">Create an account</Link>
-                                </div>
-                            </Card.Body>
-                        </Card>
-                    </Col>
-                </Row>
-            </Container>
+                            <Form.Group className="mb-1">
+                                <label className="login-label">Password</label>
+                                <input
+                                    type="password"
+                                    className="login-input"
+                                    placeholder="••••••••"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    required
+                                />
+                            </Form.Group>
+
+                            <div className="login-links">
+                                <a href="#" className="login-link">Forgot password?</a>
+                            </div>
+
+                            <Button className="login-button w-100" type="submit" disabled={loading}>
+                                {loading ? 'Logging in…' : 'Log In'}
+                            </Button>
+                        </Form>
+
+                        <p className="login-footer">
+                            New here?{' '}
+                            <Link to="/signup" className="login-link" style={{ fontWeight: 600 }}>
+                                Create an account
+                            </Link>
+                        </p>
+                    </div>
+                </div>
+
+            </div>
         </div>
     )
 }
