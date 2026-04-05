@@ -1,20 +1,52 @@
 .navbar-link-custom {
-  color: #fff !important;
-  font-weight: 500;
-  transition: transform 0.2s ease, color 0.2s ease;
+    color: #fff !important;
+    font-weight: 500;
+    transition: transform 0.2s ease, color 0.2s ease;
 }
 
 .navbar-link-custom:hover {
-  transform: translateY(-2px);
-  color: #fce1ec !important;
+    transform: translateY(-2px);
+    color: #fce1ec !important;
 }
 
 .active-link {
-  font-weight: 700;
-  text-decoration: underline;
+    font-weight: 700;
+    text-decoration: underline;
 }
 
 .navbar .dropdown-menu {
-  min-width: 150px;
-  border-radius: 12px;
+    min-width: 150px;
+    border-radius: 12px;
 }
+
+/* Profile dropdown title — single flex row */
+.navbar-profile-title {
+    display: inline-flex;
+    align-items: center;
+    line-height: 1;
+}
+
+.navbar-profile-avatar {
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    min-height: 28px;
+    max-width: 28px;
+    max-height: 28px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.navbar-profile-name {
+    color: #fff;
+    white-space: nowrap;
+}
+
+/* Color Bootstrap's native caret white */
+.navbar-profile-dropdown .dropdown-toggle::after {
+    border-top-color: #fff !important;
+    margin-left: 6px;
+}
+
+/* Remove all the belt-and-suspenders overrides that were hiding it */

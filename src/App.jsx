@@ -18,6 +18,7 @@ function ProtectedRoute({ session, children }) {
 function App() {
     const [session, setSession] = useState(undefined)
     const [profile, setProfile] = useState(null)
+    const [avatarUrl, setAvatarUrl] = useState(null)
     const navigate = useNavigate()
 
     useEffect(() => {
@@ -33,17 +34,25 @@ function App() {
     }, [])
 
     useEffect(() => {
+        if (!session?.user) return
+
         const fetchProfile = async () => {
-            if (!session.user) return
+            const { data, error } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', session.user.id)
+                .single()
 
-            const {data, error } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', session.user.id)
-            .single()
-
-            if(!error) {
+            if (!error) {
                 setProfile(data)
+            }
+
+            // Fetch avatar from storage
+            const { data: avatarData } = supabase.storage
+                .from('avatars')
+                .getPublicUrl(session.user.id)
+            if (avatarData?.publicUrl) {
+                setAvatarUrl(avatarData.publicUrl + '?t=' + Date.now())
             }
         }
         fetchProfile()
@@ -51,12 +60,14 @@ function App() {
 
     const handleLogout = async () => {
         await supabase.auth.signOut()
+        setProfile(null)
+        setAvatarUrl(null)
         navigate('/login')
     }
 
     return (
         <>
-            <AppNavbar session={session} profile={profile} handleLogout={handleLogout}/>
+            <AppNavbar session={session} profile={profile} avatarUrl={avatarUrl} handleLogout={handleLogout} />
 
             <Routes>
                 <Route path="/" element={<Navigate to="/login" replace />} />
