@@ -7,7 +7,9 @@ import {
     PersonCheck,
     BusFront,
     Heart,
+    Star,
 } from "react-bootstrap-icons";
+import { getTimeCommitment } from "../utils/time";
 import "./OpportunityCard.css";
 
 const EFFORT_CONFIG = {
@@ -36,10 +38,11 @@ function OpportunityCard({
     effortLevel = 1,
     skills = [],
     schedule,
+    timeRange,
+    timeCommitment,
     beginnerFriendly = false,
     impact,
     whyItHelps,
-    timeCommitment,
     cost = "Free",
     transitSupport,
     barrierSupport = [],
@@ -50,6 +53,7 @@ function OpportunityCard({
     isCommitted = false,
 }) {
     const effort = EFFORT_CONFIG[effortLevel] ?? EFFORT_CONFIG[1];
+    const duration = timeCommitment || getTimeCommitment(timeRange);
 
     const supportTags = [
         ...(beginnerFriendly ? ["Beginner friendly"] : []),
@@ -101,11 +105,7 @@ function OpportunityCard({
                     <div className="opportunity-chip-row">
                         <InfoChip
                             icon={<BusFront size={14} />}
-                            text={transitSupport || location}
-                        />
-                        <InfoChip
-                            icon={<Clock size={14} />}
-                            text={timeCommitment || schedule}
+                            text={transitSupport}
                         />
                         <InfoChip icon={<CashCoin size={14} />} text={cost} />
                     </div>
@@ -113,18 +113,27 @@ function OpportunityCard({
                     {supportTags.length > 0 && (
                         <div className="opportunity-chip-row opportunity-chip-row--soft">
                             {supportTags.map((tag, index) => {
-                                let icon = <PersonCheck size={14} />;
+                                const lower = tag.toLowerCase();
+                                let icon = <Star size={14} />;
 
-                                if (tag.toLowerCase().includes("kids"))
+                                if (lower.includes("kids"))
                                     icon = <People size={14} />;
-                                if (tag.toLowerCase().includes("solo"))
+                                else if (
+                                    lower.includes("solo") ||
+                                    lower.includes("alone")
+                                )
                                     icon = <PersonCheck size={14} />;
-                                if (tag.toLowerCase().includes("free"))
+                                else if (lower.includes("free"))
                                     icon = <CashCoin size={14} />;
-                                if (tag.toLowerCase().includes("location"))
+                                else if (lower.includes("location"))
                                     icon = <GeoAlt size={14} />;
-                                if (tag.toLowerCase().includes("quiet"))
+                                else if (
+                                    lower.includes("quiet") ||
+                                    lower.includes("small group")
+                                )
                                     icon = <Heart size={14} />;
+                                else if (lower.includes("beginner"))
+                                    icon = <Star size={14} />;
 
                                 return (
                                     <span
@@ -174,10 +183,30 @@ function OpportunityCard({
                             <span className="detail-value">{location}</span>
                         </div>
 
-                        <div className="opportunity-side-row">
-                            <span className="detail-label">When</span>
-                            <span className="detail-value">{schedule}</span>
-                        </div>
+                        {schedule && (
+                            <div className="opportunity-side-row">
+                                <span className="detail-label">When</span>
+                                <span className="detail-value">{schedule}</span>
+                            </div>
+                        )}
+
+                        {timeRange && (
+                            <div className="opportunity-side-row">
+                                <span className="detail-label">Time</span>
+                                <span className="detail-value">
+                                    {timeRange}
+                                </span>
+                            </div>
+                        )}
+
+                        {duration && (
+                            <div className="opportunity-side-row">
+                                <span className="detail-label">
+                                    Time commitment
+                                </span>
+                                <span className="detail-value">{duration}</span>
+                            </div>
+                        )}
 
                         <div className="opportunity-side-row">
                             <span className="detail-label">Effort</span>

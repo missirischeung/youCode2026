@@ -6,7 +6,10 @@ import {
   People,
   PersonCheck,
   Heart,
+  Star,
+  CalendarEvent,
 } from 'react-bootstrap-icons'
+import { getTimeCommitment } from '../utils/time'
 import './PreviewCard.css'
 
 const EFFORT_CONFIG = {
@@ -31,6 +34,7 @@ function PreviewCard({
   location,
   effortLevel = 1,
   schedule,
+  timeRange,
   timeCommitment,
   cost = 'Free',
   tags = [],
@@ -49,8 +53,11 @@ function PreviewCard({
   const quiet =
     lowerTags.some((tag) => tag.includes('quiet')) ||
     lowerTags.some((tag) => tag.includes('small group'))
-  const free = cost.toLowerCase().includes('free')
+  const free =
+    typeof cost === 'string' && cost.toLowerCase().includes('free')
   const beginner = beginnerFriendly
+
+  const duration = timeCommitment || getTimeCommitment(timeRange)
 
   const shortLine =
     whyItHelps ||
@@ -73,65 +80,75 @@ function PreviewCard({
       <div className="preview-card-accent" />
 
       <Card.Body className="preview-card-body">
-        <div className="preview-card-top">
-          <div className="preview-card-title-block">
-            <p className="preview-card-org">{organization}</p>
-            <h3 className="preview-card-title">{title}</h3>
-          </div>
+      <div className="preview-card-top">
+  <div className="preview-card-title-block">
+    <p className="preview-card-org">{organization}</p>
+    <h3 className="preview-card-title">{title}</h3>
+  </div>
 
-          <span className="preview-card-effort">
-            {effort.label}
-          </span>
-        </div>
+  <div className="preview-card-badges">
+    <span className="preview-card-effort">
+      {effort.label}
+    </span>
 
-        <p className="preview-card-line">
-          {shortLine}
-        </p>
+    {duration && (
+      <span className="preview-card-time">
+        Req Time: {duration}
+      </span>
+    )}
+  </div>
+</div>
+
+        <p className="preview-card-line">{shortLine}</p>
 
         <div className="preview-card-meta">
-          {(timeCommitment || schedule) && (
-            <span className="preview-meta-pill">
-              <Clock size={14} />
-              <span>{timeCommitment || schedule}</span>
-            </span>
-          )}
+  {schedule && (
+    <span className="preview-meta-pill">
+      <CalendarEvent size={14} />
+      <span>{schedule}</span>
+    </span>
+  )}
 
-          {location && (
-            <span className="preview-meta-pill">
-              <GeoAlt size={14} />
-              <span>{location}</span>
-            </span>
-          )}
+  {location && (
+    <span className="preview-meta-pill">
+      <GeoAlt size={14} />
+      <span>{location}</span>
+    </span>
+  )}
 
-          {free && (
-            <span className="preview-meta-pill">
-              <CashCoin size={14} />
-              <span>Free</span>
-            </span>
-          )}
-        </div>
+  {free && (
+    <span className="preview-meta-pill">
+      <CashCoin size={14} />
+      <span>Free</span>
+    </span>
+  )}
+</div>
 
-        <div className="preview-card-icons">
-          <IconBubble
-            show={kidsWelcome}
-            icon={<People size={15} />}
-            label="Kids welcome"
-          />
-          <IconBubble
-            show={okAlone}
-            icon={<PersonCheck size={15} />}
-            label="Okay to come alone"
-          />
-          <IconBubble
-            show={quiet}
-            icon={<Heart size={15} />}
-            label="Quiet or small group"
-          />
-          <IconBubble
-            show={beginner}
-            icon={<Clock size={15} />}
-            label="Beginner friendly"
-          />
+        <div className="preview-card-footer">
+          <div className="preview-card-icons">
+            <IconBubble
+              show={kidsWelcome}
+              icon={<People size={15} />}
+              label="Kids welcome"
+            />
+            <IconBubble
+              show={okAlone}
+              icon={<PersonCheck size={15} />}
+              label="Okay to come alone"
+            />
+            <IconBubble
+              show={quiet}
+              icon={<Heart size={15} />}
+              label="Quiet or small group"
+            />
+            <IconBubble
+              show={beginner}
+              icon={<Star size={15} />}
+              label="Beginner friendly"
+            />
+          </div>
+
+          <span className="preview-open-hint">Tap for details</span>
         </div>
       </Card.Body>
     </Card>

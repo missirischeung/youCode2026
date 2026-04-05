@@ -1,63 +1,66 @@
 .opportunity-card {
-    --oc-green: #6c877c;
-    --oc-green-dark: #567267;
-    --oc-green-soft: #edf3ef;
+    --oc-rose: #c97f97;
+    --oc-rose-dark: #a85f79;
+    --oc-rose-soft: #f7eef2;
   
-    --oc-sage: #dfe8e2;
-    --oc-sage-2: #eef3ef;
+    --oc-blush: #fbf6f8;
+    --oc-blush-2: #f9f1f4;
   
-    --oc-cream: #faf8f4;
-    --oc-border: #d8e0db;
-    --oc-text: #3f4b46;
-    --oc-muted: #728178;
+    --oc-cream: #fcf9fa;
+    --oc-border: #ead7df;
+    --oc-text: #4d3b43;
+    --oc-muted: #8a6e79;
   
-    --oc-pill-1-bg: #e8f0eb;
-    --oc-pill-1-text: #5a7568;
+    --oc-pill-1-bg: #f5e9ee;
+    --oc-pill-1-text: #9c5f76;
   
-    --oc-pill-2-bg: #f5efdf;
-    --oc-pill-2-text: #8a7440;
+    --oc-pill-2-bg: #f8efe3;
+    --oc-pill-2-text: #9a7450;
   
-    --oc-pill-3-bg: #efe7f5;
-    --oc-pill-3-text: #7a628f;
+    --oc-pill-3-bg: #efe8f6;
+    --oc-pill-3-text: #7f6497;
   
     width: 100%;
     border: 1px solid var(--oc-border) !important;
-    border-radius: 22px !important;
-    background: #ffffff !important;
+    border-radius: 24px !important;
+    background: #fffdfd !important;
     overflow: hidden;
-    box-shadow: 0 8px 22px rgba(65, 80, 72, 0.06);
+    box-shadow: 0 10px 28px rgba(114, 72, 90, 0.08);
     transition: transform 0.16s ease, box-shadow 0.16s ease;
   }
   
   .opportunity-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 12px 28px rgba(65, 80, 72, 0.1);
+    box-shadow: 0 14px 34px rgba(114, 72, 90, 0.12);
   }
   
   .opportunity-accent-bar {
-    height: 6px;
-    background: linear-gradient(90deg, #86a596, #d9e5de);
+    height: 7px;
+    background: linear-gradient(90deg, #d99bb0, #f3dbe4);
   }
   
   .opportunity-body {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    gap: 24px;
-    padding: 22px !important;
+    gap: 28px;
+    padding: 24px !important;
+    text-align: left;
   }
   
   .opportunity-main {
     flex: 1;
     min-width: 0;
+    text-align: left;
   }
   
   .opportunity-side {
-    width: 220px;
+    width: 230px;
     flex-shrink: 0;
     display: flex;
     flex-direction: column;
     gap: 14px;
+    text-align: left;
   }
   
   .opportunity-top {
@@ -65,27 +68,31 @@
     justify-content: space-between;
     align-items: flex-start;
     gap: 16px;
-    margin-bottom: 10px;
+    margin-bottom: 14px;
   }
   
   .opportunity-title-block {
     min-width: 0;
     flex: 1;
+    text-align: left;
   }
   
   .opportunity-org {
-    margin: 0 0 4px 0;
-    font-size: 0.9rem;
+    margin: 0 0 6px 0;
+    font-size: 0.82rem;
     color: var(--oc-muted);
-    font-weight: 500;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
   }
   
   .opportunity-title {
     margin: 0;
-    font-size: 1.55rem;
+    font-size: 1.65rem;
     line-height: 1.2;
     color: var(--oc-text);
-    font-weight: 600;
+    font-weight: 650;
+    text-align: left;
   }
   
   .opportunity-badges {
@@ -93,16 +100,23 @@
     flex-wrap: wrap;
     justify-content: flex-end;
     gap: 8px;
+    max-width: 240px;
   }
   
   .opportunity-badge {
     display: inline-flex;
     align-items: center;
-    padding: 0.45rem 0.8rem;
-    border-radius: 999px;
+    padding: 0.42rem 0.8rem;
+    border-radius: 10px;
     font-size: 0.8rem;
-    font-weight: 600;
+    font-weight: 700;
     white-space: nowrap;
+  }
+
+  .opportunity-badge--time {
+    background: #f6eef2;
+    color: #7a4f60;
+    border: 1px solid #ead7df;
   }
   
   .effort-level--1 .opportunity-badge--effort {
@@ -121,34 +135,37 @@
   }
   
   .opportunity-description {
-    margin: 0 0 14px 0;
+    margin: 0 0 16px 0;
     font-size: 1rem;
     line-height: 1.65;
     color: var(--oc-text);
+    text-align: left;
   }
   
   .opportunity-impact-box {
     background: var(--oc-cream);
-    border: 1px solid #ece7dd;
+    border: 1px solid #eddce3;
+    border-left: 4px solid #d89ab0;
     border-radius: 14px;
-    padding: 12px 14px;
-    margin-bottom: 14px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    text-align: left;
   }
   
   .opportunity-impact-line {
     margin: 0;
     color: var(--oc-text);
     font-size: 0.96rem;
-    line-height: 1.55;
+    line-height: 1.6;
   }
   
   .opportunity-impact-line + .opportunity-impact-line {
-    margin-top: 6px;
+    margin-top: 7px;
   }
   
   .impact-label {
-    font-weight: 600;
-    color: var(--oc-green-dark);
+    font-weight: 700;
+    color: var(--oc-rose-dark);
   }
   
   .opportunity-chip-row {
@@ -156,104 +173,112 @@
     flex-wrap: wrap;
     gap: 10px;
     margin-bottom: 12px;
+    justify-content: flex-start;
   }
   
   .opportunity-chip {
     display: inline-flex;
     align-items: center;
     gap: 7px;
-    padding: 0.45rem 0.72rem;
-    border-radius: 999px;
-    background: var(--oc-sage-2);
+    padding: 0.48rem 0.78rem;
+    border-radius: 10px;
+    background: var(--oc-blush-2);
     color: var(--oc-text);
     font-size: 0.9rem;
     border: 1px solid var(--oc-border);
   }
   
   .opportunity-chip--soft {
-    background: #f8faf8;
+    background: #fcf6f8;
   }
   
   .opportunity-chip-icon {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    color: var(--oc-green-dark);
+    color: var(--oc-rose-dark);
+    flex-shrink: 0;
   }
   
   .opportunity-support-note {
     margin-bottom: 12px;
-    font-size: 0.92rem;
+    font-size: 0.93rem;
     color: var(--oc-muted);
-    line-height: 1.5;
+    line-height: 1.55;
+    text-align: left;
   }
   
   .opportunity-builds {
     margin-bottom: 12px;
     font-size: 0.95rem;
     color: var(--oc-text);
+    line-height: 1.5;
+    text-align: left;
   }
   
   .builds-label {
-    font-weight: 600;
-    color: var(--oc-green-dark);
+    font-weight: 700;
+    color: var(--oc-rose-dark);
   }
   
   .skills-section {
-    margin-top: 4px;
+    margin-top: 6px;
   }
   
   .skills-list {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
+    justify-content: flex-start;
   }
   
   .skill-badge {
-    background: #f3f6f4 !important;
-    color: var(--oc-green-dark) !important;
+    background: #faf1f5 !important;
+    color: var(--oc-rose-dark) !important;
     border: 1px solid var(--oc-border) !important;
     border-radius: 10px !important;
-    padding: 0.42rem 0.72rem !important;
+    padding: 0.45rem 0.75rem !important;
     font-size: 0.82rem !important;
-    font-weight: 500 !important;
+    font-weight: 600 !important;
   }
   
   .opportunity-side-card {
-    background: #fbfcfb;
+    background: #fff8fa;
     border: 1px solid var(--oc-border);
     border-radius: 16px;
-    padding: 14px;
+    padding: 16px;
+    text-align: left;
   }
   
   .opportunity-side-row + .opportunity-side-row {
-    margin-top: 12px;
+    margin-top: 14px;
   }
   
   .detail-label {
     display: block;
-    margin-bottom: 2px;
-    font-size: 0.76rem;
+    margin-bottom: 3px;
+    font-size: 0.74rem;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.08em;
     color: var(--oc-muted);
-    font-weight: 600;
+    font-weight: 700;
   }
   
   .detail-value {
     display: block;
-    font-size: 0.96rem;
+    font-size: 0.97rem;
     color: var(--oc-text);
     line-height: 1.45;
+    text-align: left;
   }
   
   .opportunity-button {
     width: 100%;
-    border: 1px solid var(--oc-border) !important;
+    border: 1px solid #d9b1c1 !important;
     border-radius: 14px !important;
     background: #ffffff !important;
     color: var(--oc-text) !important;
-    font-weight: 600 !important;
+    font-weight: 700 !important;
     font-size: 1rem !important;
     padding: 0.82rem 1rem !important;
     box-shadow: none !important;
@@ -263,15 +288,18 @@
   .opportunity-button:hover,
   .opportunity-button:focus,
   .opportunity-button:active {
-    background: var(--oc-green) !important;
+    background: var(--oc-rose) !important;
     color: #ffffff !important;
-    border-color: var(--oc-green) !important;
+    border-color: var(--oc-rose) !important;
   }
   
   .opportunity-title,
   .opportunity-org,
   .opportunity-description,
-  .detail-value {
+  .detail-value,
+  .opportunity-impact-line,
+  .opportunity-support-note,
+  .opportunity-builds {
     overflow-wrap: break-word;
     word-break: normal;
   }
@@ -293,3 +321,4 @@
       justify-content: flex-start;
     }
   }
+
