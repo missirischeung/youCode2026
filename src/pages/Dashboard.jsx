@@ -32,7 +32,7 @@ function Dashboard({ onCommit, committedIds = [] }) {
         show={!!selectedOpportunity}
         onHide={() => setSelectedOpportunity(null)}
         centered
-        size="lg"
+        size="xl"
         dialogClassName="opportunity-modal"
       >
         <Modal.Body className="opportunity-modal-body">

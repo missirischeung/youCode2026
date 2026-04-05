@@ -20,7 +20,6 @@ const opportunities = [
             "Kids welcome",
             "OK to come alone",
             "Quiet, small group",
-            "Free",
         ],
         builds: ["Cooking basics", "Teamwork", "Confidence"],
         skills: ["Cooking basics", "Teamwork", "Confidence"],
@@ -44,7 +43,7 @@ const opportunities = [
         whyItHelps:
             "A gentle way to ease into volunteering with clear tasks and fresh air.",
         barrierSupport: ["Drop-in welcome"],
-        tags: ["OK to come alone", "Quiet, small group", "Free"],
+        tags: ["OK to come alone", "Quiet, small group"],
         builds: ["Routine", "Confidence", "Responsibility"],
         skills: ["Gardening basics", "Teamwork"],
         nextStepLabel: "I'm in",

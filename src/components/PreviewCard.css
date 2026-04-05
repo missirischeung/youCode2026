@@ -23,13 +23,14 @@
     overflow: hidden;
     cursor: pointer;
     box-shadow: 0 8px 22px rgba(114, 72, 90, 0.06);
-    transition: transform 0.16s ease, box-shadow 0.16s ease;
+    transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
   }
   
   .preview-card:hover,
   .preview-card:focus-within {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 28px rgba(114, 72, 90, 0.1);
+    transform: translateY(-8px) scale(1.01);
+    box-shadow: 0 20px 40px rgba(114, 72, 90, 0.16);
+    border-color: #dfbcc8 !important;
   }
   
   .preview-card-accent {
@@ -190,6 +191,32 @@
     background: #f6eef2;
     color: #7a4f60;
     border: 1px solid #ead7df;
+  }
+
+  .preview-open-button {
+    min-width: 132px;
+    height: 48px;
+    padding: 0 1rem;
+    border-radius: 14px;
+    border: 1px solid #e2bcc9;
+    background: #f6e9ee;
+    color: #9a5f76;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+    flex-shrink: 0;
+    font-weight: 700;
+    font-size: 0.92rem;
+    box-shadow: 0 8px 18px rgba(114, 72, 90, 0.08);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  }
+  
+  .preview-open-button:hover,
+  .preview-open-button:focus {
+    background: #f2dfe7;
+    transform: translateY(-1px);
+    box-shadow: 0 12px 22px rgba(114, 72, 90, 0.12);
   }
   
   @media (max-width: 768px) {

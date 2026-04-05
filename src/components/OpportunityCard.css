@@ -199,6 +199,16 @@
     color: var(--oc-rose-dark);
     flex-shrink: 0;
   }
+
+  .detail-link {
+    text-decoration: none;
+    color: #a85f79;
+    font-weight: 600;
+  }
+  
+  .detail-link:hover {
+    text-decoration: underline;
+  }
   
   .opportunity-support-note {
     margin-bottom: 12px;
