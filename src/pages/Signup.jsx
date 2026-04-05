@@ -16,6 +16,19 @@ function Signup() {
         setError('')
         setLoading(true)
 
+        // Check if a profile already exists with this email
+        const { data: existingProfile } = await supabase
+            .from('profiles')
+            .select('id')
+            .eq('email', email)
+            .maybeSingle()
+
+        if (existingProfile) {
+            setError('An account with this email already exists. Please log in instead.')
+            setLoading(false)
+            return
+        }
+
         const { error: signUpError } = await supabase.auth.signUp({ email, password })
 
         setLoading(false)
@@ -38,7 +51,12 @@ function Signup() {
 
                                 {error && (
                                     <div className="alert alert-danger py-2" role="alert">
-                                        {error}
+                                        {error}{' '}
+                                        {error.includes('log in') && (
+                                            <Link to="/login" style={{ color: '#842029', fontWeight: 600 }}>
+                                                Go to login →
+                                            </Link>
+                                        )}
                                     </div>
                                 )}
 
@@ -64,7 +82,7 @@ function Signup() {
                                     </Form.Group>
 
                                     <Button variant="dark" className="w-100" type="submit" disabled={loading}>
-                                        {loading ? 'Creating account…' : 'Create Account'}
+                                        {loading ? 'Checking…' : 'Create Account'}
                                     </Button>
                                 </Form>
 
