@@ -1,80 +1,91 @@
-import { useEffect, useState } from 'react'
-import { Routes, Route, Link, Navigate, useNavigate } from 'react-router'
+import { useEffect, useState } from "react";
+import { Routes, Route, Link, Navigate, useNavigate } from "react-router";
 
-import { supabase } from './supabaseClient'
-import Login from './pages/Login'
-import Signup from './pages/Signup'
-import Dashboard from './pages/Dashboard'
-import Profile from './pages/Profile'
-import AppNavbar from './components/AppNavBar'
-
+import { supabase } from "./supabaseClient";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import Dashboard from "./pages/Dashboard";
+import Profile from "./pages/Profile";
+import AppNavbar from "./components/AppNavBar";
 
 function ProtectedRoute({ session, children }) {
-    if (session === undefined) return null
-    if (!session) return <Navigate to="/login" replace />
-    return children
+    if (session === undefined) return null;
+    if (!session) return <Navigate to="/login" replace />;
+    return children;
 }
 
 function App() {
-    const [session, setSession] = useState(undefined)
-    const [profile, setProfile] = useState(null)
-    const [avatarUrl, setAvatarUrl] = useState(null)
-    const navigate = useNavigate()
+    const [session, setSession] = useState(undefined);
+    const [profile, setProfile] = useState(null);
+    const [avatarUrl, setAvatarUrl] = useState(null);
+    const [searchQuery, setSearchQuery] = useState("");
+    const navigate = useNavigate();
 
     useEffect(() => {
         supabase.auth.getSession().then(({ data }) => {
-            setSession(data.session ?? null)
-        })
+            setSession(data.session ?? null);
+        });
 
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-            setSession(session ?? null)
-        })
+        const {
+            data: { subscription },
+        } = supabase.auth.onAuthStateChange((_event, session) => {
+            setSession(session ?? null);
+        });
 
-        return () => subscription.unsubscribe()
-    }, [])
+        return () => subscription.unsubscribe();
+    }, []);
 
     useEffect(() => {
-        if (!session?.user) return
+        if (!session?.user) return;
 
         const fetchProfile = async () => {
             const { data, error } = await supabase
-                .from('profiles')
-                .select('*')
-                .eq('id', session.user.id)
-                .single()
+                .from("profiles")
+                .select("*")
+                .eq("id", session.user.id)
+                .single();
 
             if (!error) {
-                setProfile(data)
+                setProfile(data);
             }
 
             // Only set avatar if the file actually exists in storage
             const { data: avatarData } = supabase.storage
-                .from('avatars')
-                .getPublicUrl(session.user.id)
+                .from("avatars")
+                .getPublicUrl(session.user.id);
             if (avatarData?.publicUrl) {
                 try {
-                    const res = await fetch(avatarData.publicUrl, { method: 'HEAD' })
+                    const res = await fetch(avatarData.publicUrl, {
+                        method: "HEAD",
+                    });
                     if (res.ok) {
-                        setAvatarUrl(avatarData.publicUrl + '?t=' + Date.now())
+                        setAvatarUrl(avatarData.publicUrl + "?t=" + Date.now());
                     }
                 } catch {
                     // no avatar uploaded, leave avatarUrl as null
                 }
             }
-        }
-        fetchProfile()
-    }, [session])
+        };
+        fetchProfile();
+    }, [session]);
 
     const handleLogout = async () => {
-        await supabase.auth.signOut()
-        setProfile(null)
-        setAvatarUrl(null)
-        navigate('/login')
-    }
+        await supabase.auth.signOut();
+        setProfile(null);
+        setAvatarUrl(null);
+        navigate("/login");
+    };
 
     return (
         <>
-            <AppNavbar session={session} profile={profile} avatarUrl={avatarUrl} handleLogout={handleLogout} />
+<AppNavbar
+    session={session}
+    profile={profile}
+    avatarUrl={avatarUrl}
+    handleLogout={handleLogout}
+    searchQuery={searchQuery}
+    setSearchQuery={setSearchQuery}
+/>
 
             <Routes>
                 <Route path="/" element={<Navigate to="/login" replace />} />
@@ -84,7 +95,7 @@ function App() {
                     path="/dashboard"
                     element={
                         <ProtectedRoute session={session}>
-                            <Dashboard />
+                            <Dashboard searchQuery={searchQuery} />
                         </ProtectedRoute>
                     }
                 />
@@ -98,7 +109,7 @@ function App() {
                 />
             </Routes>
         </>
-    )
+    );
 }
 
-export default App
+export default App;

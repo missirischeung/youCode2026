@@ -6,7 +6,7 @@ import opportunities from '../data/opportunities'
 import { supabase } from '../supabaseClient'
 import './Dashboard.css'
 
-function Dashboard({ onCommit, committedIds = [] }) {
+function Dashboard({ searchQuery = '' }) {
     const [selectedOpportunity, setSelectedOpportunity] = useState(null)
     const [committedIds, setCommittedIds] = useState([])
     const [userId, setUserId] = useState(null)
