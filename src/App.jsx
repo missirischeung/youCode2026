@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Routes, Route, Link, Navigate, useNavigate } from 'react-router'
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom'
 
 import { supabase } from './supabaseClient'
 import Login from './pages/Login'
@@ -7,7 +7,6 @@ import Signup from './pages/Signup'
 import Dashboard from './pages/Dashboard'
 import Profile from './pages/Profile'
 import AppNavbar from './components/AppNavBar'
-
 
 function ProtectedRoute({ session, children }) {
     if (session === undefined) return null
@@ -18,7 +17,8 @@ function ProtectedRoute({ session, children }) {
 function App() {
     const [session, setSession] = useState(undefined)
     const [profile, setProfile] = useState(null)
-    const [avatarUrl, setAvatarUrl] = useState(null)
+    const [searchQuery, setSearchQuery] = useState('')
+    const [committedIds, setCommittedIds] = useState([])
     const navigate = useNavigate()
 
     useEffect(() => {
@@ -26,61 +26,70 @@ function App() {
             setSession(data.session ?? null)
         })
 
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-            setSession(session ?? null)
-        })
+        const { data: { subscription } } =
+            supabase.auth.onAuthStateChange((_event, session) => {
+                setSession(session ?? null)
+            })
 
         return () => subscription.unsubscribe()
     }, [])
 
     useEffect(() => {
-        if (!session?.user) return
-
         const fetchProfile = async () => {
+            if (!session || !session.user) return
+
             const { data, error } = await supabase
                 .from('profiles')
                 .select('*')
                 .eq('id', session.user.id)
                 .single()
 
-            if (!error) {
-                setProfile(data)
-            }
-
-            // Fetch avatar from storage
-            const { data: avatarData } = supabase.storage
-                .from('avatars')
-                .getPublicUrl(session.user.id)
-            if (avatarData?.publicUrl) {
-                setAvatarUrl(avatarData.publicUrl + '?t=' + Date.now())
-            }
+            if (!error) setProfile(data)
         }
+
         fetchProfile()
     }, [session])
 
     const handleLogout = async () => {
         await supabase.auth.signOut()
-        setProfile(null)
-        setAvatarUrl(null)
         navigate('/login')
+    }
+
+    const handleCommit = (opportunity) => {
+        if (!opportunity?.id) return
+        if (!committedIds.includes(opportunity.id)) {
+            setCommittedIds(prev => [...prev, opportunity.id])
+        }
     }
 
     return (
         <>
-            <AppNavbar session={session} profile={profile} avatarUrl={avatarUrl} handleLogout={handleLogout} />
+            <AppNavbar
+                session={session}
+                profile={profile}
+                handleLogout={handleLogout}
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+            />
 
             <Routes>
                 <Route path="/" element={<Navigate to="/login" replace />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<Signup />} />
+
                 <Route
                     path="/dashboard"
                     element={
                         <ProtectedRoute session={session}>
-                            <Dashboard />
+                            <Dashboard
+                                searchQuery={searchQuery}
+                                onCommit={handleCommit}
+                                committedIds={committedIds}
+                            />
                         </ProtectedRoute>
                     }
                 />
+
                 <Route
                     path="/profile"
                     element={

@@ -5,13 +5,26 @@ import OpportunityCard from '../components/OpportunityCard'
 import opportunities from '../data/opportunities'
 import './Dashboard.css'
 
-function Dashboard({ onCommit, committedIds = [] }) {
+function Dashboard({ onCommit = () => {}, committedIds = [], searchQuery = '' }) {
     const [selectedOpportunity, setSelectedOpportunity] = useState(null)
 
-    function handleCommit(details) {
-        onCommit?.(details)
+    const handleCommit = (details) => {
+        onCommit(details)
         setSelectedOpportunity(null)
     }
+
+    const filteredOpportunities = opportunities.filter((opportunity) => {
+        const query = searchQuery.toLowerCase()
+
+        return (
+            opportunity.title?.toLowerCase().includes(query) ||
+            opportunity.organization?.toLowerCase().includes(query) ||
+            opportunity.location?.toLowerCase().includes(query) ||
+            opportunity.skills?.some(skill =>
+                skill.toLowerCase().includes(query)
+            )
+        )
+    })
 
     return (
         <div className="dashboard-page">
@@ -23,13 +36,19 @@ function Dashboard({ onCommit, committedIds = [] }) {
                 </p>
 
                 <div className="opportunity-list">
-                    {opportunities.map((opportunity) => (
-                        <PreviewCard
-                            key={opportunity.id}
-                            {...opportunity}
-                            onClick={() => setSelectedOpportunity(opportunity)}
-                        />
-                    ))}
+                    {filteredOpportunities.length === 0 ? (
+                        <p style={{ color: '#64748b' }}>
+                            No opportunities match your search.
+                        </p>
+                    ) : (
+                        filteredOpportunities.map((opportunity) => (
+                            <PreviewCard
+                                key={opportunity.id}
+                                {...opportunity}
+                                onClick={() => setSelectedOpportunity(opportunity)}
+                            />
+                        ))
+                    )}
                 </div>
             </Container>
 
