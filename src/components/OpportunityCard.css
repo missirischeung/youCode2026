@@ -1,17 +1,17 @@
 /* ─── Tokens ─────────────────────────────────────────────── */
 .oc-card {
-    --oc-rose:         #c97f97;
-    --oc-rose-dark:    #a85f79;
-    --oc-rose-soft:    #f7eef2;
-    --oc-sage:         #9caf88;
-    --oc-sage-dark:    #6f8662;
-    --oc-sage-soft:    #eef4ea;
-    --oc-sage-border:  #d7e4d0;
-    --oc-blush:        #fffdfd;
-    --oc-cream:        #fff8fa;
-    --oc-border:       #ead7df;
-    --oc-text:         #4d3b43;
-    --oc-muted:        #8a6e79;
+    --oc-rose: #c97f97;
+    --oc-rose-dark: #a85f79;
+    --oc-rose-soft: #f7eef2;
+    --oc-sage: #9caf88;
+    --oc-sage-dark: #6f8662;
+    --oc-sage-soft: #eef4ea;
+    --oc-sage-border: #d7e4d0;
+    --oc-blush: #fffdfd;
+    --oc-cream: #fff8fa;
+    --oc-border: #ead7df;
+    --oc-text: #4d3b43;
+    --oc-muted: #8a6e79;
     --oc-tab-inactive: #eddde6;
 }
 
@@ -24,6 +24,7 @@
     font-family: 'DM Sans', 'Segoe UI', sans-serif;
     overflow: hidden;
     min-height: 640px;
+    text-align: left;
 }
 
 /* ─── Accent bar ─────────────────────────────────────────── */
@@ -39,9 +40,10 @@
     flex-direction: column;
     gap: 10px;
     padding: 16px 20px 14px;
+    min-height: 160px;
 }
 
-/* top row: time badge left, X button right */
+/* top row: close button left, time badge right */
 .oc-header-top {
     display: flex;
     align-items: center;
@@ -68,14 +70,14 @@
     height: 30px;
     border-radius: 50%;
     border: 1.5px solid var(--oc-border);
-    background: transparent;
+    background: rgba(255, 255, 255, 0.75);
     color: var(--oc-muted);
     font-size: 0.8rem;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background 0.15s ease, color 0.15s ease; 
+    transition: background 0.15s ease, color 0.15s ease;
     font-family: inherit;
     line-height: 1;
 }
@@ -99,6 +101,7 @@
     text-transform: uppercase;
     color: var(--oc-muted);
     overflow-wrap: break-word;
+    text-align: left;
 }
 
 .oc-title {
@@ -108,6 +111,7 @@
     line-height: 1.22;
     color: var(--oc-text);
     overflow-wrap: break-word;
+    text-align: left;
 }
 
 .oc-location-link {
@@ -142,7 +146,7 @@
     gap: 6px;
     padding: 0.45rem 0.78rem;
     border-radius: 12px;
-    background: #fcf4f7;
+    background: rgba(252, 244, 247, 0.88);
     border: 1px solid var(--oc-border);
     color: var(--oc-text);
     font-size: 0.84rem;
@@ -156,13 +160,6 @@
 }
 
 /* ─── Binder tabs ────────────────────────────────────────── */
-/*
-  Tabs sit inside the card, just above the panel border.
-  Inactive tabs are slightly lowered (translateY 3px) and use
-  a darker blush background so they read as "behind" the card.
-  The active tab lifts flush, turns white, and its bottom border
-  disappears — making it look physically joined to the panel below.
-*/
 .oc-binder-nav {
     display: flex;
     align-items: flex-end;
@@ -173,7 +170,9 @@
     scrollbar-width: none;
 }
 
-.oc-binder-nav::-webkit-scrollbar { display: none; }
+.oc-binder-nav::-webkit-scrollbar {
+    display: none;
+}
 
 .oc-binder-tab {
     padding: 8px 18px 12px;
@@ -191,7 +190,6 @@
     position: relative;
     transform: translateY(3px);
     transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
-    /* bottom cover — hides the panel border under the active tab */
     z-index: 1;
 }
 
@@ -209,7 +207,6 @@
     z-index: 3;
 }
 
-/* white strip that sits over the panel's top border under the active tab */
 .oc-binder-tab.active::after {
     content: '';
     position: absolute;
@@ -232,8 +229,15 @@
 }
 
 @keyframes oc-fade-slide {
-    from { opacity: 0; transform: translateY(6px); }
-    to   { opacity: 1; transform: translateY(0);   }
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .oc-section {
@@ -329,12 +333,18 @@
     user-select: none;
 }
 
-.oc-contact-summary::-webkit-details-marker { display: none; }
+.oc-contact-summary::-webkit-details-marker {
+    display: none;
+}
+
 .oc-contact-summary::before {
     content: '▸ ';
     font-size: 0.75rem;
 }
-details[open] .oc-contact-summary::before { content: '▾ '; }
+
+details[open] .oc-contact-summary::before {
+    content: '▾ ';
+}
 
 .oc-contact-dropdown-body {
     padding: 0 14px 12px;
@@ -370,7 +380,10 @@ details[open] .oc-contact-summary::before { content: '▾ '; }
     text-decoration: none;
 }
 
-.oc-contact-link:hover { color: var(--oc-rose); text-decoration: underline; }
+.oc-contact-link:hover {
+    color: var(--oc-rose);
+    text-decoration: underline;
+}
 
 /* ─── When & where (logistics tab) ──────────────────────── */
 .oc-direction-block {
@@ -407,7 +420,10 @@ details[open] .oc-contact-summary::before { content: '▾ '; }
     width: fit-content;
 }
 
-.oc-map-link:hover { color: var(--oc-rose); text-decoration: underline; }
+.oc-map-link:hover {
+    color: var(--oc-rose);
+    text-decoration: underline;
+}
 
 /* ─── Good to know (barriers tab) ───────────────────────── */
 .oc-good-list {
@@ -437,8 +453,15 @@ details[open] .oc-contact-summary::before { content: '▾ '; }
     flex-shrink: 0;
 }
 
-.oc-good-dot--green { background: #eaf3e6; color: #2d5e26; }
-.oc-good-dot--amber { background: #fdf7ec; color: #7a5c1e; }
+.oc-good-dot--green {
+    background: #eaf3e6;
+    color: #2d5e26;
+}
+
+.oc-good-dot--amber {
+    background: #fdf7ec;
+    color: #7a5c1e;
+}
 
 /* ─── Skills tab ─────────────────────────────────────────── */
 .oc-skills-row {
@@ -492,7 +515,9 @@ details[open] .oc-contact-summary::before { content: '▾ '; }
     box-shadow: 0 14px 28px rgba(169, 95, 121, 0.22);
 }
 
-.oc-commit-btn:active:not(:disabled) { transform: scale(0.975); }
+.oc-commit-btn:active:not(:disabled) {
+    transform: scale(0.975);
+}
 
 .oc-commit-btn-inner {
     position: relative;
@@ -512,10 +537,21 @@ details[open] .oc-contact-summary::before { content: '▾ '; }
     will-change: transform, opacity;
 }
 
-.oc-commit-btn-text.is-visible  { opacity: 1; transform: translateY(0);     }
-.oc-commit-btn-text.is-hidden   { opacity: 0; transform: translateY(120%);  }
-.oc-commit-btn-text--alt.is-hidden { transform: translateY(-120%);          }
+.oc-commit-btn-text.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
 
+.oc-commit-btn-text.is-hidden {
+    opacity: 0;
+    transform: translateY(120%);
+}
+
+.oc-commit-btn-text--alt.is-hidden {
+    transform: translateY(-120%);
+}
+
+/* Registered / upcoming */
 .oc-commit-btn--committed {
     background: linear-gradient(135deg, #eef4ea 0%, #dbe8d3 100%) !important;
     color: var(--oc-sage-dark) !important;
@@ -527,6 +563,16 @@ details[open] .oc-contact-summary::before { content: '▾ '; }
     background: linear-gradient(135deg, #e4efdc 0%, #cfdfc5 100%) !important;
 }
 
+/* Already completed — locked, muted warm grey */
+.oc-commit-btn--completed {
+    background: linear-gradient(135deg, #f0ece4 0%, #e6e0d8 100%) !important;
+    color: #7a7060 !important;
+    border-color: #d4ccc0 !important;
+    box-shadow: none;
+    cursor: default;
+    opacity: 0.85;
+}
+
 .oc-commit-btn:disabled {
     background: #e8d0d8;
     color: #b89aa4;
@@ -536,11 +582,33 @@ details[open] .oc-contact-summary::before { content: '▾ '; }
 
 /* ─── Responsive ─────────────────────────────────────────── */
 @media (max-width: 600px) {
-    .oc-header      { padding: 16px 18px 12px; }
-    .oc-binder-nav  { padding: 0 14px; }
-    .oc-binder-tab  { padding: 7px 13px 11px; font-size: 0.78rem; }
-    .oc-section     { padding: 16px 18px; }
-    .oc-footer      { padding: 14px 18px 18px; }
-    .oc-title       { font-size: 1.3rem; }
-    .oc-commit-btn  { min-width: 0; width: 100%; }
+    .oc-header {
+        padding: 16px 18px 12px;
+    }
+
+    .oc-binder-nav {
+        padding: 0 14px;
+    }
+
+    .oc-binder-tab {
+        padding: 7px 13px 11px;
+        font-size: 0.78rem;
+    }
+
+    .oc-section {
+        padding: 16px 18px;
+    }
+
+    .oc-footer {
+        padding: 14px 18px 18px;
+    }
+
+    .oc-title {
+        font-size: 1.3rem;
+    }
+
+    .oc-commit-btn {
+        min-width: 0;
+        width: 100%;
+    }
 }

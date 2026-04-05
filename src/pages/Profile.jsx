@@ -9,6 +9,7 @@ import {
     Spinner,
     Badge,
     ProgressBar,
+    Modal,
 } from 'react-bootstrap'
 import {
     CalendarEvent,
@@ -22,6 +23,10 @@ import { supabase } from '../supabaseClient'
 import opportunities from '../data/opportunities'
 import { getTimeCommitment } from '../utils/time'
 import './Profile.css'
+import '../pages/Dashboard.css'
+import OpportunityCard from '../components/OpportunityCard'
+
+const DEFAULT_AVATAR = `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Ccircle cx='20' cy='20' r='20' fill='%23e8d5dc'/%3E%3Ccircle cx='20' cy='16' r='7' fill='%23c49aac'/%3E%3Cellipse cx='20' cy='36' rx='12' ry='9' fill='%23c49aac'/%3E%3C/svg%3E`
 
 const GENDER_OPTIONS = [
     'Prefer not to say',
@@ -94,6 +99,7 @@ function Profile() {
     const [avatarUrl, setAvatarUrl] = useState(null)
     const [avatarUploading, setAvatarUploading] = useState(false)
     const fileInputRef = useRef(null)
+    const [selectedOpportunity, setSelectedOpportunity] = useState(null)
 
     const savedProfileRef = useRef(null)
 
@@ -125,7 +131,14 @@ function Profile() {
                     .from('avatars')
                     .getPublicUrl(user.id)
                 if (avatarData?.publicUrl) {
-                    setAvatarUrl(avatarData.publicUrl + '?t=' + Date.now())
+                    try {
+                        const res = await fetch(avatarData.publicUrl, { method: 'HEAD' })
+                        if (res.ok) {
+                            setAvatarUrl(avatarData.publicUrl + '?t=' + Date.now())
+                        }
+                    } catch {
+                        // no avatar uploaded, leave avatarUrl as null
+                    }
                 }
             }
 
@@ -202,6 +215,23 @@ function Profile() {
         } else {
             const { data } = supabase.storage.from('avatars').getPublicUrl(user.id)
             setAvatarUrl(data.publicUrl + '?t=' + Date.now())
+        }
+        setAvatarUploading(false)
+    }
+
+
+    // ── Avatar remove ─────────────────────────────────────────
+    const handleRemoveAvatar = async () => {
+        if (!userId) return
+        setAvatarUploading(true)
+        setError('')
+        const { error: removeError } = await supabase.storage
+            .from('avatars')
+            .remove([userId])
+        if (removeError) {
+            setError('Failed to remove photo: ' + removeError.message)
+        } else {
+            setAvatarUrl(null)
         }
         setAvatarUploading(false)
     }
@@ -367,398 +397,442 @@ function Profile() {
     }
 
     return (
-        <div className="profile-page">
-            <Container className="py-5">
+        <>
+            <div className="profile-page">
+                <Container className="py-5">
 
-                {/* ── Hero Card ── */}
-                <Card className="journey-hero-card">
-                    <div className="journey-hero-top">
-                        <div className="journey-hero-copy">
-                            <p className="journey-kicker">YOUR JOURNEY SO FAR</p>
-                            <h1 className="journey-title">A look at what you've been part of</h1>
-                            <p className="journey-subtitle">
-                                See what you've explored so far, what's coming up next, and what's been helping you move forward.
-                            </p>
-                        </div>
-
-                        {/* Avatar */}
-                        <div className="journey-avatar-wrap">
-                            <div style={{ position: 'relative', display: 'inline-block' }}>
-                                <img
-                                    src={avatarUrl || 'https://www.gravatar.com/avatar/?d=mp&s=120'}
-                                    alt="avatar"
-                                    className="journey-avatar"
-                                />
-                                {editing && (
-                                    <>
-                                        <button
-                                            onClick={() => fileInputRef.current?.click()}
-                                            disabled={avatarUploading}
-                                            style={{
-                                                position: 'absolute', bottom: 2, right: 2,
-                                                background: '#4d3b43', border: 'none', borderRadius: '50%',
-                                                width: 28, height: 28, color: '#fff', fontSize: '0.8rem',
-                                                cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                            }}
-                                            title="Change photo"
-                                        >
-                                            {avatarUploading ? '…' : '✎'}
-                                        </button>
-                                        <input ref={fileInputRef} type="file" accept="image/*"
-                                            style={{ display: 'none' }} onChange={handleAvatarChange} />
-                                    </>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="journey-profile-bar">
-                        <div className="journey-profile-info">
-                            <p className="journey-name">{profile?.name || 'Your profile'}</p>
-                            <p className="journey-email">{profile?.email || '—'}</p>
-                        </div>
-
-                        {/* "Edit details" only shown when NOT editing — no Close editor button */}
-                        {!editing && (
-                            <Button
-                                className="journey-btn-primary"
-                                onClick={() => {
-                                    savedProfileRef.current = { ...profile }
-                                    setEditing(true)
-                                }}
-                            >
-                                Edit details
-                            </Button>
-                        )}
-                    </div>
-
-                    {!editing ? (
-                        <>
-                            <div className="journey-meta-row">
-                                {profile?.pronouns && <span className="journey-meta-pill">{profile.pronouns}</span>}
-                                {profile?.gender_identity && <span className="journey-meta-pill">{profile.gender_identity}</span>}
-                                {profile?.location && <span className="journey-meta-pill">{profile.location}</span>}
-                                {profile?.age && <span className="journey-meta-pill">Age {profile.age}</span>}
-                                {profile?.has_children && <span className="journey-meta-pill">Has children</span>}
-                                {profile?.has_pets && <span className="journey-meta-pill">Has pets</span>}
+                    {/* ── Hero Card ── */}
+                    <Card className="journey-hero-card">
+                        <div className="journey-hero-top">
+                            <div className="journey-hero-copy">
+                                <p className="journey-kicker">YOUR JOURNEY SO FAR</p>
+                                <h1 className="journey-title">A look at what you've been part of</h1>
+                                <p className="journey-subtitle">
+                                    See what you've explored so far, what's coming up next, and what's been helping you move forward.
+                                </p>
                             </div>
 
-                            {profile?.skill_set?.length > 0 && (
-                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '0.75rem' }}>
-                                    {profile.skill_set.map((s) => <Bubble key={s} label={s} />)}
-                                </div>
-                            )}
-
-                            {profile?.accessibility_needs?.length > 0 && (
-                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '0.5rem' }}>
-                                    {profile.accessibility_needs.map((s) => <Bubble key={s} label={`♿ ${s}`} />)}
-                                </div>
-                            )}
-
-                            <div className="journey-encouragement-card">
-                                <div className="journey-encouragement-icon"><Stars /></div>
-                                <div>
-                                    <p className="journey-encouragement-title">Small steps still count</p>
-                                    <p className="journey-encouragement-text">{encouragement}</p>
+                            {/* Avatar */}
+                            <div className="journey-avatar-wrap">
+                                <div style={{ position: 'relative', display: 'inline-block' }}>
+                                    <img
+                                        src={avatarUrl || DEFAULT_AVATAR}
+                                        alt="avatar"
+                                        className="journey-avatar"
+                                    />
+                                    {editing && (
+                                        <>
+                                            {/* Change photo pencil button */}
+                                            <button
+                                                onClick={() => fileInputRef.current?.click()}
+                                                disabled={avatarUploading}
+                                                style={{
+                                                    position: 'absolute', bottom: 2, right: 2,
+                                                    background: '#4d3b43', border: 'none', borderRadius: '50%',
+                                                    width: 28, height: 28, color: '#fff', fontSize: '0.8rem',
+                                                    cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                }}
+                                                title="Change photo"
+                                            >
+                                                {avatarUploading ? '…' : '✎'}
+                                            </button>
+                                            <input ref={fileInputRef} type="file" accept="image/*"
+                                                style={{ display: 'none' }} onChange={handleAvatarChange} />
+                                            {/* Remove photo button — only shown if an avatar exists */}
+                                            {avatarUrl && (
+                                                <button
+                                                    onClick={handleRemoveAvatar}
+                                                    disabled={avatarUploading}
+                                                    style={{
+                                                        position: 'absolute', top: 2, right: 2,
+                                                        background: '#b44f68', border: 'none', borderRadius: '50%',
+                                                        width: 22, height: 22, color: '#fff', fontSize: '0.7rem',
+                                                        cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                        lineHeight: 1,
+                                                    }}
+                                                    title="Remove photo"
+                                                >
+                                                    ✕
+                                                </button>
+                                            )}
+                                        </>
+                                    )}
                                 </div>
                             </div>
-                        </>
-                    ) : (
-                        <Form className="journey-edit-form">
-                            <Row className="g-3">
-                                <Col md={6}>
-                                    <Form.Group>
-                                        <Form.Label>Name</Form.Label>
-                                        <Form.Control value={profile?.name || ''} onChange={(e) => handleChange('name', e.target.value)} />
-                                    </Form.Group>
-                                </Col>
-                                <Col md={6}>
-                                    <Form.Group>
-                                        <Form.Label>Age</Form.Label>
-                                        <Form.Control type="number" min={0} max={100} value={profile?.age || ''} onChange={handleAgeChange} />
-                                        <Form.Text className="text-muted">0–100 only.</Form.Text>
-                                    </Form.Group>
-                                </Col>
-                                <Col md={6}>
-                                    <Form.Group>
-                                        <Form.Label>Pronouns</Form.Label>
-                                        <Form.Control value={profile?.pronouns || ''} onChange={(e) => handleChange('pronouns', e.target.value)} />
-                                    </Form.Group>
-                                </Col>
-                                <Col md={6}>
-                                    <Form.Group>
-                                        <Form.Label>Gender Identity</Form.Label>
-                                        <Form.Select value={profile?.gender_identity || ''} onChange={(e) => handleChange('gender_identity', e.target.value)}>
-                                            <option value="">Select…</option>
-                                            {GENDER_OPTIONS.map((g) => <option key={g} value={g}>{g}</option>)}
-                                        </Form.Select>
-                                    </Form.Group>
-                                </Col>
-                                <Col md={12}>
-                                    <Form.Group>
-                                        <Form.Label>Location</Form.Label>
-                                        <Form.Control
-                                            value={profile?.location || ''}
-                                            onFocus={handleLocationFocus}
-                                            onChange={(e) => handleChange('location', e.target.value)}
-                                            placeholder="Click to use your location, or type manually"
-                                        />
-                                        <Form.Text className="text-muted">Clicking the field will ask to use your device location.</Form.Text>
-                                    </Form.Group>
-                                </Col>
-                                <Col md={6}>
-                                    <Form.Group>
-                                        <Form.Label>Skills / Interests</Form.Label>
-                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '8px' }}>
-                                            {(profile?.skill_set || []).map((s) => <Bubble key={s} label={s} onRemove={() => removeSkill(s)} />)}
-                                        </div>
-                                        <Form.Control value={skillInput} onChange={(e) => setSkillInput(e.target.value)} onKeyDown={handleSkillKeyDown} placeholder="Type a skill and press Enter" />
-                                        <Form.Text className="text-muted">Press Enter to add each skill.</Form.Text>
-                                    </Form.Group>
-                                </Col>
-                                <Col md={6}>
-                                    <Form.Group>
-                                        <Form.Label>Accessibility Needs</Form.Label>
-                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '8px' }}>
-                                            {(profile?.accessibility_needs || []).map((s) => <Bubble key={s} label={s} onRemove={() => removeAccessibility(s)} />)}
-                                        </div>
-                                        <Form.Control value={accessibilityInput} onChange={(e) => setAccessibilityInput(e.target.value)} onKeyDown={handleAccessibilityKeyDown} placeholder="Type a need and press Enter" />
-                                        <Form.Text className="text-muted">Press Enter to add each item.</Form.Text>
-                                    </Form.Group>
-                                </Col>
-                                <Col md={6}>
-                                    <Form.Check type="checkbox" label="I have children" checked={profile?.has_children || false} onChange={(e) => handleChange('has_children', e.target.checked)} />
-                                </Col>
-                                <Col md={6}>
-                                    <Form.Check type="checkbox" label="I have pets" checked={profile?.has_pets || false} onChange={(e) => handleChange('has_pets', e.target.checked)} />
-                                </Col>
-                            </Row>
+                        </div>
 
-                            <div className="journey-edit-actions">
-                                <Button className="journey-btn-primary" onClick={handleSave} disabled={saving}>
-                                    {saving ? 'Saving…' : 'Save changes'}
-                                </Button>
-                                {/* Cancel reverts changes and closes the form */}
+                        <div className="journey-profile-bar">
+                            <div className="journey-profile-info">
+                                <p className="journey-name">{profile?.name || 'Your profile'}</p>
+                                <p className="journey-email">{profile?.email || '—'}</p>
+                            </div>
+
+                            {/* "Edit details" only shown when NOT editing — no Close editor button */}
+                            {!editing && (
                                 <Button
-                                    className="journey-btn-secondary"
+                                    className="journey-btn-primary"
                                     onClick={() => {
-                                        if (savedProfileRef.current) setProfile(savedProfileRef.current)
-                                        setEditing(false)
-                                        setSkillInput('')
-                                        setAccessibilityInput('')
-                                        setError('')
-                                        setSuccess('')
+                                        savedProfileRef.current = { ...profile }
+                                        setEditing(true)
                                     }}
                                 >
-                                    Cancel
+                                    Edit details
                                 </Button>
-                            </div>
-                        </Form>
-                    )}
-
-                    {error && <p className="journey-message journey-error">{error}</p>}
-                    {success && <p className="journey-message journey-success">{success}</p>}
-                </Card>
-
-                {/* ── Summary Cards — driven by event_history only ── */}
-                <Row className="g-4 mt-1 mb-4">
-                    <Col md={6} xl={3} className="d-flex">
-                        <Card className="journey-summary-card">
-                            <div className="journey-summary-icon"><Heart /></div>
-                            <p className="journey-summary-label">Events completed</p>
-                            <h3 className="journey-summary-value">{totalCompleted}</h3>
-                            <p className="journey-summary-subtext">opportunities finished so far</p>
-                        </Card>
-                    </Col>
-                    <Col md={6} xl={3} className="d-flex">
-                        <Card className="journey-summary-card">
-                            <div className="journey-summary-icon"><Clock /></div>
-                            <p className="journey-summary-label">Time you've given</p>
-                            <h3 className="journey-summary-value">{totalHours.toFixed(1)}</h3>
-                            <p className="journey-summary-subtext">hours completed</p>
-                        </Card>
-                    </Col>
-                    <Col md={6} xl={3} className="d-flex">
-                        <Card className="journey-summary-card">
-                            <div className="journey-summary-icon"><PersonHeart /></div>
-                            <p className="journey-summary-label">This week's momentum</p>
-                            <h3 className="journey-summary-value">{weeklyCount}/{weeklyGoal}</h3>
-                            <p className="journey-summary-subtext">completed toward your goal</p>
-                        </Card>
-                    </Col>
-                    <Col md={6} xl={3} className="d-flex">
-                        <Card className="journey-summary-card">
-                            <div className="journey-summary-icon"><Stars /></div>
-                            <p className="journey-summary-label">What's felt manageable</p>
-                            <h3 className="journey-summary-value">{manageableSummary.length || 0}</h3>
-                            <p className="journey-summary-subtext">supportive patterns so far</p>
-                        </Card>
-                    </Col>
-                </Row>
-
-                {/* ── Progress Card ── */}
-                <Card className="journey-progress-card mb-4">
-                    <div className="journey-section-header">
-                        <div>
-                            <p className="journey-section-kicker">THIS WEEK</p>
-                            <h3 className="journey-section-title">Keep building at your pace</h3>
+                            )}
                         </div>
-                        <Badge className="journey-soft-badge">
-                            {weeklyGoal - weeklyCount > 0
-                                ? `${weeklyGoal - weeklyCount} more to this week's goal`
-                                : "You reached this week's goal"}
-                        </Badge>
-                    </div>
-                    <p className="journey-progress-copy">
-                        Even one small, manageable opportunity can help build more comfort, routine, and independence over time.
-                    </p>
-                    <ProgressBar now={weeklyPercent} className="journey-progress-bar" />
-                </Card>
 
-                {/* ── My Events + Themes ── */}
-                <Row className="g-4 mb-4">
-                    <Col lg={7}>
-                        <Card className="journey-section-card h-100">
-                            <div className="journey-section-header">
-                                <div>
-                                    <p className="journey-section-kicker">YOUR EVENTS</p>
-                                    <h3 className="journey-section-title">My Events</h3>
+                        {!editing ? (
+                            <>
+                                <div className="journey-meta-row">
+                                    {profile?.pronouns && <span className="journey-meta-pill">{profile.pronouns}</span>}
+                                    {profile?.gender_identity && <span className="journey-meta-pill">{profile.gender_identity}</span>}
+                                    {profile?.location && <span className="journey-meta-pill">{profile.location}</span>}
+                                    {profile?.age && <span className="journey-meta-pill">Age {profile.age}</span>}
+                                    {profile?.has_children && <span className="journey-meta-pill">Has children</span>}
+                                    {profile?.has_pets && <span className="journey-meta-pill">Has pets</span>}
                                 </div>
-                            </div>
 
-                            {allMyEvents.length === 0 ? (
-                                <div className="journey-empty-state">
-                                    <p className="journey-empty-title">No events yet</p>
-                                    <p className="journey-empty-text">
-                                        When you say "I'm in" to an opportunity, it'll show up here.
-                                    </p>
-                                </div>
-                            ) : (
-                                <div className="journey-opportunity-list">
-                                    {allMyEvents.map((op) => (
-                                        <div
-                                            key={op.id}
-                                            className="journey-opportunity-item"
-                                            style={{
-                                                filter: op._completed ? 'grayscale(1)' : 'none',
-                                                opacity: op._completed ? 0.65 : 1,
-                                                transition: 'filter 0.2s ease, opacity 0.2s ease',
-                                            }}
-                                        >
-                                            <div className="journey-opportunity-main">
-                                                <p className="journey-opportunity-org">{op.organization}</p>
-                                                <h4 className="journey-opportunity-title">{op.title}</h4>
-                                                <div className="journey-opportunity-meta">
-                                                    {op.schedule && (
-                                                        <span className="journey-opportunity-pill">
-                                                            <CalendarEvent size={14} />{op.schedule}
-                                                        </span>
-                                                    )}
-                                                    {op.timeRange && (
-                                                        <span className="journey-opportunity-pill">
-                                                            <Clock size={14} />{op.timeRange}
-                                                        </span>
-                                                    )}
-                                                    {op.location && (
-                                                        <span className="journey-opportunity-pill">
-                                                            <GeoAlt size={14} />{op.location}
-                                                        </span>
-                                                    )}
-                                                </div>
-                                            </div>
+                                {profile?.skill_set?.length > 0 && (
+                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '0.75rem' }}>
+                                        {profile.skill_set.map((s) => <Bubble key={s} label={s} />)}
+                                    </div>
+                                )}
 
-                                            {/* Right column — badge on top, then cancel, then checkbox */}
-                                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '0.5rem', flexShrink: 0 }}>
-                                                <Badge className={`journey-opportunity-badge ${op._completed ? 'journey-opportunity-badge--past' : ''}`}>
-                                                    {op._completed ? 'Completed' : (op.effortLevel === 1 ? 'Easy start' : op.effortLevel === 2 ? 'Small stretch' : 'Ready for more')}
-                                                </Badge>
+                                {profile?.accessibility_needs?.length > 0 && (
+                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '0.5rem' }}>
+                                        {profile.accessibility_needs.map((s) => <Bubble key={s} label={`♿ ${s}`} />)}
+                                    </div>
+                                )}
 
-                                                {/* Cancel registration — only for non-completed */}
-                                                {!op._completed && (
-                                                    <button
-                                                        className="journey-uncommit-btn"
-                                                        onClick={() => handleUncommit(op.id)}
-                                                    >
-                                                        Cancel registration
-                                                    </button>
-                                                )}
-
-                                                {/* Mark as done checkbox — below cancel, left-aligned with it */}
-                                                <label
-                                                    style={{
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        gap: '6px',
-                                                        fontSize: '0.82rem',
-                                                        fontWeight: 600,
-                                                        color: op._completed ? '#8a6e79' : '#5d4a52',
-                                                        cursor: 'pointer',
-                                                        userSelect: 'none',
-                                                    }}
-                                                >
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={op._completed}
-                                                        onChange={() =>
-                                                            op._completed
-                                                                ? handleUndoComplete(op.id)
-                                                                : handleMarkComplete(op.id)
-                                                        }
-                                                        style={{ accentColor: '#c97f97', width: 16, height: 16, cursor: 'pointer' }}
-                                                    />
-                                                    {op._completed ? 'Mark as not done' : 'Mark as done'}
-                                                </label>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </Card>
-                    </Col>
-
-                    <Col lg={5}>
-                        <Card className="journey-section-card h-100">
-                            <div className="journey-section-header">
-                                <div>
-                                    <p className="journey-section-kicker">WHAT'S BEEN HELPING</p>
-                                    <h3 className="journey-section-title">What this has been helping you practice</h3>
-                                </div>
-                            </div>
-
-                            {reflectionThemes.length === 0 ? (
-                                <div className="journey-empty-state">
-                                    <p className="journey-empty-title">Nothing here yet</p>
-                                    <p className="journey-empty-text">
-                                        As you complete opportunities, this section will reflect the kinds of steps you've been taking.
-                                    </p>
-                                </div>
-                            ) : (
-                                <div className="journey-theme-list">
-                                    {reflectionThemes.map((theme) => (
-                                        <div key={theme} className="journey-theme-item">
-                                            <span className="journey-theme-dot" />
-                                            <span>{theme}</span>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-
-                            {manageableSummary.length > 0 && (
-                                <div className="journey-manageable-block">
-                                    <p className="journey-manageable-title">What's felt more manageable so far</p>
-                                    <div className="journey-manageable-tags">
-                                        {manageableSummary.map((item) => (
-                                            <span key={item} className="journey-manageable-pill">{item}</span>
-                                        ))}
+                                <div className="journey-encouragement-card">
+                                    <div className="journey-encouragement-icon"><Stars /></div>
+                                    <div>
+                                        <p className="journey-encouragement-title">Small steps still count</p>
+                                        <p className="journey-encouragement-text">{encouragement}</p>
                                     </div>
                                 </div>
-                            )}
-                        </Card>
-                    </Col>
-                </Row>
+                            </>
+                        ) : (
+                            <Form className="journey-edit-form">
+                                <Row className="g-3">
+                                    <Col md={6}>
+                                        <Form.Group>
+                                            <Form.Label>Name</Form.Label>
+                                            <Form.Control value={profile?.name || ''} onChange={(e) => handleChange('name', e.target.value)} />
+                                        </Form.Group>
+                                    </Col>
+                                    <Col md={6}>
+                                        <Form.Group>
+                                            <Form.Label>Age</Form.Label>
+                                            <Form.Control type="number" min={0} max={100} value={profile?.age || ''} onChange={handleAgeChange} />
+                                            <Form.Text className="text-muted">0–100 only.</Form.Text>
+                                        </Form.Group>
+                                    </Col>
+                                    <Col md={6}>
+                                        <Form.Group>
+                                            <Form.Label>Pronouns</Form.Label>
+                                            <Form.Control value={profile?.pronouns || ''} onChange={(e) => handleChange('pronouns', e.target.value)} />
+                                        </Form.Group>
+                                    </Col>
+                                    <Col md={6}>
+                                        <Form.Group>
+                                            <Form.Label>Gender Identity</Form.Label>
+                                            <Form.Select value={profile?.gender_identity || ''} onChange={(e) => handleChange('gender_identity', e.target.value)}>
+                                                <option value="">Select…</option>
+                                                {GENDER_OPTIONS.map((g) => <option key={g} value={g}>{g}</option>)}
+                                            </Form.Select>
+                                        </Form.Group>
+                                    </Col>
+                                    <Col md={12}>
+                                        <Form.Group>
+                                            <Form.Label>Location</Form.Label>
+                                            <Form.Control
+                                                value={profile?.location || ''}
+                                                onFocus={handleLocationFocus}
+                                                onChange={(e) => handleChange('location', e.target.value)}
+                                                placeholder="Click to use your location, or type manually"
+                                            />
+                                            <Form.Text className="text-muted">Clicking the field will ask to use your device location.</Form.Text>
+                                        </Form.Group>
+                                    </Col>
+                                    <Col md={6}>
+                                        <Form.Group>
+                                            <Form.Label>Skills / Interests</Form.Label>
+                                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '8px' }}>
+                                                {(profile?.skill_set || []).map((s) => <Bubble key={s} label={s} onRemove={() => removeSkill(s)} />)}
+                                            </div>
+                                            <Form.Control value={skillInput} onChange={(e) => setSkillInput(e.target.value)} onKeyDown={handleSkillKeyDown} placeholder="Type a skill and press Enter" />
+                                            <Form.Text className="text-muted">Press Enter to add each skill.</Form.Text>
+                                        </Form.Group>
+                                    </Col>
+                                    <Col md={6}>
+                                        <Form.Group>
+                                            <Form.Label>Accessibility Needs</Form.Label>
+                                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '8px' }}>
+                                                {(profile?.accessibility_needs || []).map((s) => <Bubble key={s} label={s} onRemove={() => removeAccessibility(s)} />)}
+                                            </div>
+                                            <Form.Control value={accessibilityInput} onChange={(e) => setAccessibilityInput(e.target.value)} onKeyDown={handleAccessibilityKeyDown} placeholder="Type a need and press Enter" />
+                                            <Form.Text className="text-muted">Press Enter to add each item.</Form.Text>
+                                        </Form.Group>
+                                    </Col>
+                                    <Col md={6}>
+                                        <Form.Check type="checkbox" label="I have children" checked={profile?.has_children || false} onChange={(e) => handleChange('has_children', e.target.checked)} />
+                                    </Col>
+                                    <Col md={6}>
+                                        <Form.Check type="checkbox" label="I have pets" checked={profile?.has_pets || false} onChange={(e) => handleChange('has_pets', e.target.checked)} />
+                                    </Col>
+                                </Row>
 
-            </Container>
-        </div>
+                                <div className="journey-edit-actions">
+                                    <Button className="journey-btn-primary" onClick={handleSave} disabled={saving}>
+                                        {saving ? 'Saving…' : 'Save changes'}
+                                    </Button>
+                                    {/* Cancel reverts changes and closes the form */}
+                                    <Button
+                                        className="journey-btn-secondary"
+                                        onClick={() => {
+                                            if (savedProfileRef.current) setProfile(savedProfileRef.current)
+                                            setEditing(false)
+                                            setSkillInput('')
+                                            setAccessibilityInput('')
+                                            setError('')
+                                            setSuccess('')
+                                        }}
+                                    >
+                                        Cancel
+                                    </Button>
+                                </div>
+                            </Form>
+                        )}
+
+                        {error && <p className="journey-message journey-error">{error}</p>}
+                        {success && <p className="journey-message journey-success">{success}</p>}
+                    </Card>
+
+                    {/* ── Summary Cards — driven by event_history only ── */}
+                    <Row className="g-4 mt-1 mb-4">
+                        <Col md={6} xl={3} className="d-flex">
+                            <Card className="journey-summary-card">
+                                <div className="journey-summary-icon"><Heart /></div>
+                                <p className="journey-summary-label">Events completed</p>
+                                <h3 className="journey-summary-value">{totalCompleted}</h3>
+                                <p className="journey-summary-subtext">opportunities finished so far</p>
+                            </Card>
+                        </Col>
+                        <Col md={6} xl={3} className="d-flex">
+                            <Card className="journey-summary-card">
+                                <div className="journey-summary-icon"><Clock /></div>
+                                <p className="journey-summary-label">Time you've given</p>
+                                <h3 className="journey-summary-value">{totalHours.toFixed(1)}</h3>
+                                <p className="journey-summary-subtext">hours completed</p>
+                            </Card>
+                        </Col>
+                        <Col md={6} xl={3} className="d-flex">
+                            <Card className="journey-summary-card">
+                                <div className="journey-summary-icon"><PersonHeart /></div>
+                                <p className="journey-summary-label">This week's momentum</p>
+                                <h3 className="journey-summary-value">{weeklyCount}/{weeklyGoal}</h3>
+                                <p className="journey-summary-subtext">completed toward your goal</p>
+                            </Card>
+                        </Col>
+                        <Col md={6} xl={3} className="d-flex">
+                            <Card className="journey-summary-card">
+                                <div className="journey-summary-icon"><Stars /></div>
+                                <p className="journey-summary-label">What's felt manageable</p>
+                                <h3 className="journey-summary-value">{manageableSummary.length || 0}</h3>
+                                <p className="journey-summary-subtext">supportive patterns so far</p>
+                            </Card>
+                        </Col>
+                    </Row>
+
+                    {/* ── Progress Card ── */}
+                    <Card className="journey-progress-card mb-4">
+                        <div className="journey-section-header">
+                            <div>
+                                <p className="journey-section-kicker">THIS WEEK</p>
+                                <h3 className="journey-section-title">Keep building at your pace</h3>
+                            </div>
+                            <Badge className="journey-soft-badge">
+                                {weeklyGoal - weeklyCount > 0
+                                    ? `${weeklyGoal - weeklyCount} more to this week's goal`
+                                    : "You reached this week's goal"}
+                            </Badge>
+                        </div>
+                        <p className="journey-progress-copy">
+                            Even one small, manageable opportunity can help build more comfort, routine, and independence over time.
+                        </p>
+                        <ProgressBar now={weeklyPercent} className="journey-progress-bar" />
+                    </Card>
+
+                    {/* ── My Events + Themes ── */}
+                    <Row className="g-4 mb-4">
+                        <Col lg={7}>
+                            <Card className="journey-section-card h-100">
+                                <div className="journey-section-header">
+                                    <div>
+                                        <p className="journey-section-kicker">YOUR EVENTS</p>
+                                        <h3 className="journey-section-title">My Events</h3>
+                                    </div>
+                                </div>
+
+                                {allMyEvents.length === 0 ? (
+                                    <div className="journey-empty-state">
+                                        <p className="journey-empty-title">No events yet</p>
+                                        <p className="journey-empty-text">
+                                            When you say "I'm in" to an opportunity, it'll show up here.
+                                        </p>
+                                    </div>
+                                ) : (
+                                    <div className="journey-opportunity-list">
+                                        {allMyEvents.map((op) => (
+                                            <div
+                                                key={op.id}
+                                                className="journey-opportunity-item"
+                                                onClick={() => setSelectedOpportunity(op)}
+                                                style={{
+                                                    filter: op._completed ? 'grayscale(1)' : 'none',
+                                                    opacity: op._completed ? 0.65 : 1,
+                                                    transition: 'filter 0.2s ease, opacity 0.2s ease',
+                                                    cursor: 'pointer',
+                                                }}
+                                            >
+                                                <div className="journey-opportunity-main">
+                                                    <p className="journey-opportunity-org">{op.organization}</p>
+                                                    <h4 className="journey-opportunity-title">{op.title}</h4>
+                                                    <div className="journey-opportunity-meta">
+                                                        {op.schedule && (
+                                                            <span className="journey-opportunity-pill">
+                                                                <CalendarEvent size={14} />{op.schedule}
+                                                            </span>
+                                                        )}
+                                                        {op.timeRange && (
+                                                            <span className="journey-opportunity-pill">
+                                                                <Clock size={14} />{op.timeRange}
+                                                            </span>
+                                                        )}
+                                                        {op.location && (
+                                                            <span className="journey-opportunity-pill">
+                                                                <GeoAlt size={14} />{op.location}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </div>
+
+                                                {/* Right column — badge on top, then cancel, then checkbox */}
+                                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '0.5rem', flexShrink: 0 }}>
+                                                    <Badge className={`journey-opportunity-badge ${op._completed ? 'journey-opportunity-badge--past' : ''}`}>
+                                                        {op._completed ? 'Completed' : (op.effortLevel === 1 ? 'Easy start' : op.effortLevel === 2 ? 'Small stretch' : 'Ready for more')}
+                                                    </Badge>
+
+                                                    {/* Cancel registration — only for non-completed */}
+                                                    {!op._completed && (
+                                                        <button
+                                                            className="journey-uncommit-btn"
+                                                            onClick={(e) => { e.stopPropagation(); handleUncommit(op.id) }}
+                                                        >
+                                                            Cancel registration
+                                                        </button>
+                                                    )}
+
+                                                    {/* Mark as done checkbox — below cancel, left-aligned with it */}
+                                                    <label
+                                                        onClick={(e) => e.stopPropagation()}
+                                                        style={{
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            gap: '6px',
+                                                            fontSize: '0.82rem',
+                                                            fontWeight: 600,
+                                                            color: op._completed ? '#8a6e79' : '#5d4a52',
+                                                            cursor: 'pointer',
+                                                            userSelect: 'none',
+                                                        }}
+                                                    >
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={op._completed}
+                                                            onChange={() =>
+                                                                op._completed
+                                                                    ? handleUndoComplete(op.id)
+                                                                    : handleMarkComplete(op.id)
+                                                            }
+                                                            style={{ accentColor: '#c97f97', width: 16, height: 16, cursor: 'pointer' }}
+                                                        />
+                                                        {op._completed ? 'Mark as not done' : 'Mark as done'}
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </Card>
+                        </Col>
+
+                        <Col lg={5}>
+                            <Card className="journey-section-card h-100">
+                                <div className="journey-section-header">
+                                    <div>
+                                        <p className="journey-section-kicker">WHAT'S BEEN HELPING</p>
+                                        <h3 className="journey-section-title">What this has been helping you practice</h3>
+                                    </div>
+                                </div>
+
+                                {reflectionThemes.length === 0 ? (
+                                    <div className="journey-empty-state">
+                                        <p className="journey-empty-title">Nothing here yet</p>
+                                        <p className="journey-empty-text">
+                                            As you complete opportunities, this section will reflect the kinds of steps you've been taking.
+                                        </p>
+                                    </div>
+                                ) : (
+                                    <div className="journey-theme-list">
+                                        {reflectionThemes.map((theme) => (
+                                            <div key={theme} className="journey-theme-item">
+                                                <span className="journey-theme-dot" />
+                                                <span>{theme}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+
+                                {manageableSummary.length > 0 && (
+                                    <div className="journey-manageable-block">
+                                        <p className="journey-manageable-title">What's felt more manageable so far</p>
+                                        <div className="journey-manageable-tags">
+                                            {manageableSummary.map((item) => (
+                                                <span key={item} className="journey-manageable-pill">{item}</span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </Card>
+                        </Col>
+                    </Row>
+
+                </Container>
+            </div>
+
+            {/* ── Opportunity detail modal (same as Dashboard) ── */}
+            <Modal
+                show={!!selectedOpportunity}
+                onHide={() => setSelectedOpportunity(null)}
+                centered
+                size="lg"
+                dialogClassName="opportunity-modal"
+            >
+                <Modal.Body className="opportunity-modal-body p-0">
+                    {selectedOpportunity && (
+                        <OpportunityCard
+                            {...selectedOpportunity}
+                            isCommitted={futureIds.includes(selectedOpportunity.id) || historyIds.includes(selectedOpportunity.id)}
+                            isCompleted={historyIds.includes(selectedOpportunity.id)}
+                            onCommit={({ id }) => { handleUncommit(id); setSelectedOpportunity(null) }}
+                            onClose={() => setSelectedOpportunity(null)}
+                        />
+                    )}
+                </Modal.Body>
+            </Modal>
+        </>
     )
 }
 

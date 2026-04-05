@@ -10,10 +10,10 @@ import { getTimeCommitment } from "../utils/time";
 import "./OpportunityCard.css";
 
 const TABS = [
-    { id: "overview",  label: "Overview"     },
+    { id: "overview", label: "Overview" },
     { id: "logistics", label: "When & where" },
-    { id: "barriers",  label: "Good to know" },
-    { id: "skills",    label: "Skills"       },
+    { id: "barriers", label: "Good to know" },
+    { id: "skills", label: "Skills" },
 ];
 
 function InfoCell({ label, value, icon }) {
@@ -62,6 +62,7 @@ function OpportunityCard({
     nextStepLabel = "I'm in",
     onCommit,
     isCommitted = false,
+    isCompleted = false,
     meetingPoint,
     arrivalNotes,
     accessibilityNotes,
@@ -77,11 +78,11 @@ function OpportunityCard({
     const duration = timeCommitment || getTimeCommitment(timeRange);
 
     const lowerTags = tags.map((t) => t.toLowerCase());
-    const hasKids   = lowerTags.some((t) => t.includes("kids"));
-    const hasSolo   = lowerTags.some((t) => t.includes("alone") || t.includes("solo"));
-    const hasQuiet  = lowerTags.some((t) => t.includes("quiet") || t.includes("small group"));
+    const hasKids = lowerTags.some((t) => t.includes("kids"));
+    const hasSolo = lowerTags.some((t) => t.includes("alone") || t.includes("solo"));
+    const hasQuiet = lowerTags.some((t) => t.includes("quiet") || t.includes("small group"));
     const hasDropIn = barrierSupport.some((b) => b.toLowerCase().includes("drop"));
-    const hasBring  = barrierSupport.find((b) => b.toLowerCase().includes("bring"));
+    const hasBring = barrierSupport.find((b) => b.toLowerCase().includes("bring"));
 
     const displaySkills = builds.length > 0
         ? builds
@@ -98,54 +99,53 @@ function OpportunityCard({
             <div className="oc-accent-bar" />
 
             {/* ── Header: always visible ── */}
-<div
-    className="oc-header"
-    style={{
-        backgroundImage: image ? `url(${image})` : undefined,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        position: "relative",
-    }}
->
-    {/* Optional overlay for readability */}
-    {image && (
-        <div
-            style={{
-                position: "absolute",
-                inset: 0,
-                backgroundColor: "rgba(255, 255, 255, 0.45)", // tweak opacity as needed
-                zIndex: 1,
-            }}
-        />
-    )}
+            <div
+                className="oc-header"
+                style={{
+                    backgroundImage: image ? `url(${image})` : undefined,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                    position: "relative",
+                }}
+            >
+                {/* Overlay for readability when image is present */}
+                {image && (
+                    <div
+                        style={{
+                            position: "absolute",
+                            inset: 0,
+                            backgroundColor: "rgba(255, 255, 255, 0.45)",
+                            zIndex: 1,
+                        }}
+                    />
+                )}
 
-    <div style={{ position: "relative", zIndex: 2 }}>
-        {/* existing header content */}
-        <div className="oc-header-top">
-            <button className="oc-close-btn" onClick={onClose} aria-label="Close">✕</button>
-            {duration && (
-                <span className="oc-time-badge">
-                    <Clock size={12} /> Time Commitment: {duration}
-                </span>
-            )}
-        </div>
-        <div className="oc-title-group">
-            <p className="oc-org">{organization}</p>
-            <h3 className="oc-title">{title}</h3>
-            {location && mapsUrl && (
-                <a href={mapsUrl} target="_blank" rel="noopener noreferrer" className="oc-location-link">
-                    <GeoAlt size={13} />
-                    <span>{location}</span>
-                </a>
-            )}
-            <div className="oc-quick-tags">
-                {schedule && <span className="oc-quick-tag"><CalendarEvent size={13} /><span>{schedule}</span></span>}
-                {timeRange && <span className="oc-quick-tag"><Clock size={13} /><span>{timeRange}</span></span>}
-                {cost && <span className="oc-quick-tag"><CashCoin size={13} /><span>{cost}</span></span>}
+                <div style={{ position: "relative", zIndex: 2 }}>
+                    <div className="oc-header-top">
+                        <button className="oc-close-btn" onClick={onClose} aria-label="Close">✕</button>
+                        {duration && (
+                            <span className="oc-time-badge">
+                                <Clock size={12} /> Time Commitment: {duration}
+                            </span>
+                        )}
+                    </div>
+                    <div className="oc-title-group">
+                        <p className="oc-org">{organization}</p>
+                        <h3 className="oc-title">{title}</h3>
+                        {location && mapsUrl && (
+                            <a href={mapsUrl} target="_blank" rel="noopener noreferrer" className="oc-location-link">
+                                <GeoAlt size={13} />
+                                <span>{location}</span>
+                            </a>
+                        )}
+                        <div className="oc-quick-tags">
+                            {schedule && <span className="oc-quick-tag"><CalendarEvent size={13} /><span>{schedule}</span></span>}
+                            {timeRange && <span className="oc-quick-tag"><Clock size={13} /><span>{timeRange}</span></span>}
+                            {cost && <span className="oc-quick-tag"><CashCoin size={13} /><span>{cost}</span></span>}
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
-</div>
 
             {/* ── Binder tabs — sit inside the card, above the panel border ── */}
             <div className="oc-binder-nav">
@@ -289,12 +289,12 @@ function OpportunityCard({
                 {activeTab === "barriers" && (
                     <div className="oc-section">
                         <div className="oc-good-list">
-                            <GoodItem show={hasDropIn}      label="Drop-in — no sign-up needed"    variant="green" />
-                            <GoodItem show={hasKids}        label="OK to bring kids"                variant="green" />
-                            <GoodItem show={hasQuiet}       label="Quiet, small group environment"  variant="green" />
-                            <GoodItem show={hasSolo}        label="Fine to come alone"              variant="green" />
-                            <GoodItem show={beginnerFriendly} label="Beginner friendly"             variant="green" />
-                            <GoodItem show={!!hasBring}     label={hasBring || ""}                  variant="amber" />
+                            <GoodItem show={hasDropIn} label="Drop-in — no sign-up needed" variant="green" />
+                            <GoodItem show={hasKids} label="OK to bring kids" variant="green" />
+                            <GoodItem show={hasQuiet} label="Quiet, small group environment" variant="green" />
+                            <GoodItem show={hasSolo} label="Fine to come alone" variant="green" />
+                            <GoodItem show={beginnerFriendly} label="Beginner friendly" variant="green" />
+                            <GoodItem show={!!hasBring} label={hasBring || ""} variant="amber" />
                         </div>
                     </div>
                 )}
@@ -321,21 +321,36 @@ function OpportunityCard({
 
             {/* ── Footer: always visible ── */}
             <div className="oc-footer">
-                <button
-                    type="button"
-                    className={`oc-commit-btn ${isCommitted ? "oc-commit-btn--committed" : ""}`}
-                    onClick={() => onCommit?.({ id, title, organization, location })}
-                    aria-live="polite"
-                >
-                    <span className="oc-commit-btn-inner">
-                        <span className={`oc-commit-btn-text ${isCommitted ? "is-hidden" : "is-visible"}`}>
-                            {nextStepLabel}
+                {isCompleted ? (
+                    <button
+                        type="button"
+                        className="oc-commit-btn oc-commit-btn--completed"
+                        disabled
+                        aria-label="You have already completed this event"
+                    >
+                        <span className="oc-commit-btn-inner">
+                            <span className="oc-commit-btn-text is-visible">
+                                ✓ Already completed
+                            </span>
                         </span>
-                        <span className={`oc-commit-btn-text oc-commit-btn-text--alt ${isCommitted ? "is-visible" : "is-hidden"}`}>
-                            ✕ Cancel registration
+                    </button>
+                ) : (
+                    <button
+                        type="button"
+                        className={`oc-commit-btn ${isCommitted ? "oc-commit-btn--committed" : ""}`}
+                        onClick={() => onCommit?.({ id, title, organization, location })}
+                        aria-live="polite"
+                    >
+                        <span className="oc-commit-btn-inner">
+                            <span className={`oc-commit-btn-text ${isCommitted ? "is-hidden" : "is-visible"}`}>
+                                {nextStepLabel}
+                            </span>
+                            <span className={`oc-commit-btn-text oc-commit-btn-text--alt ${isCommitted ? "is-visible" : "is-hidden"}`}>
+                                ✕ Cancel registration
+                            </span>
                         </span>
-                    </span>
-                </button>
+                    </button>
+                )}
             </div>
         </div>
     );

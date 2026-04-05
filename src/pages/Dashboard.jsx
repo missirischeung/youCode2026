@@ -9,9 +9,10 @@ import './Dashboard.css'
 function Dashboard({ searchQuery = '' }) {
     const [selectedOpportunity, setSelectedOpportunity] = useState(null)
     const [committedIds, setCommittedIds] = useState([])
+    const [completedIds, setCompletedIds] = useState([])
     const [userId, setUserId] = useState(null)
 
-    // Load the current user + their existing future_events on mount
+    // Load the current user + their existing future_events and event_history on mount
     useEffect(() => {
         const init = async () => {
             const { data: { user } } = await supabase.auth.getUser()
@@ -20,12 +21,15 @@ function Dashboard({ searchQuery = '' }) {
 
             const { data } = await supabase
                 .from('profiles')
-                .select('future_events')
+                .select('future_events, event_history')
                 .eq('id', user.id)
                 .single()
 
             if (data?.future_events?.length) {
                 setCommittedIds(data.future_events)
+            }
+            if (data?.event_history?.length) {
+                setCompletedIds(data.event_history)
             }
         }
         init()
@@ -33,6 +37,9 @@ function Dashboard({ searchQuery = '' }) {
 
     const handleCommit = async ({ id }) => {
         if (!userId) return
+
+        // Block re-registration for events already marked as done
+        if (completedIds.includes(id)) return
 
         const isAlreadyCommitted = committedIds.includes(id)
         const updated = isAlreadyCommitted
@@ -50,6 +57,9 @@ function Dashboard({ searchQuery = '' }) {
 
         setSelectedOpportunity(null)
     }
+
+    const isCompleted = (id) => completedIds.includes(id)
+    const isCommittedOrDone = (id) => committedIds.includes(id) || completedIds.includes(id)
 
     const filteredOpportunities = opportunities.filter((opportunity) => {
         const query = searchQuery.toLowerCase()
@@ -102,7 +112,8 @@ function Dashboard({ searchQuery = '' }) {
                         <OpportunityCard
                             {...selectedOpportunity}
                             onCommit={handleCommit}
-                            isCommitted={committedIds.includes(selectedOpportunity.id)}
+                            isCommitted={isCommittedOrDone(selectedOpportunity.id)}
+                            isCompleted={isCompleted(selectedOpportunity.id)}
                             onClose={() => setSelectedOpportunity(null)}
                         />
                     )}

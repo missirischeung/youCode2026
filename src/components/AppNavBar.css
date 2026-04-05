@@ -19,23 +19,23 @@
     border-radius: 12px;
 }
 
-/* Profile dropdown title — single flex row */
+/* Profile dropdown title — avatar left, name middle, caret right */
 .navbar-profile-title {
     display: inline-flex;
     align-items: center;
     line-height: 1;
 }
 
+/* Avatar sized to match the surrounding text (~1em = ~16px) */
 .navbar-profile-avatar {
-    width: 28px;
-    height: 28px;
-    min-width: 28px;
-    min-height: 28px;
-    max-width: 28px;
-    max-height: 28px;
+    width: 1.5em;
+    height: 1.5em;
     border-radius: 50%;
     object-fit: cover;
     flex-shrink: 0;
+    border: 1.5px solid rgba(255, 255, 255, 0.6);
+    margin-right: 0.45em;
+    /* space between pfp and name */
 }
 
 .navbar-profile-name {
@@ -43,10 +43,9 @@
     white-space: nowrap;
 }
 
-/* Color Bootstrap's native caret white */
+/* Caret sits naturally after the title content, coloured white */
 .navbar-profile-dropdown .dropdown-toggle::after {
     border-top-color: #fff !important;
     margin-left: 6px;
+    vertical-align: middle;
 }
-
-/* Remove all the belt-and-suspenders overrides that were hiding it */
