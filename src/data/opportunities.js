@@ -2,6 +2,9 @@ import kitchenImg from "../assets/kitchen.png";
 import gardenImg from "../assets/gardener.png";
 import dogWalkImg from "../assets/dogWalk.png";
 import seniorCareImg from "../assets/seniorCareImg.png";
+import stravaWalk from "../assets/stravaWalk.png"
+import coffeeMeet from "../assets/coffeeMeet.png"
+import yoga from "../assets/yoga.png"
 const opportunities = [
     {
         id: 1,
@@ -136,6 +139,99 @@ const opportunities = [
         contactEmail: "arbutus@agecare.ca",
         image: seniorCareImg,
     },
+    {
+    id: 5,
+    title: "Strava Community Walk",
+    organization: "Strava",
+    description:
+        "Join a small group for a relaxed walk through a part of stanley park. No pressure to talk — just move at your own pace.",
+    location: "Stanley Park, Vancouver, BC V6G 1Z4",
+    effortLevel: 1,
+    schedule: "Sunday mornings",
+    timeRange: "10am-11am",
+    cost: "Free",
+    transitSupport: "Stanley Park, Vancouver, BC V6G 1Z4",
+    beginnerFriendly: true,
+    impact: "Encourages gentle movement and connection with nature",
+    whyItHelps:
+        "Walking side-by-side can feel easier than face-to-face interaction, making it a comfortable first step.",
+    barrierSupport: ["No sign-up required", "Join or leave anytime"],
+    tags: ["OK to come alone", "Quiet, small group", "fitness-orientated"],
+    builds: ["Routine", "Comfort outdoors", "Confidence"],
+    skills: ["Consistency", "Self-paced activity"],
+    nextStepLabel: "Join the walk",
+    activities: [
+        "Walk along guided park routes",
+        "Take breaks if needed",
+        "Enjoy quiet or light conversation",
+    ],
+    website: "https://www.strava.com",
+    contactName: "Team Strava",
+    contactEmail: "support@strava.zendesk.com",
+    image: stravaWalk,
+    },
+    {
+    id: 6,
+    title: "Casual Coffee Meetup",
+    organization: "Breka Cafe",
+    description:
+        "Drop in for a casual coffee with a small group. Stay for 5 minutes or an hour — it's completely up to you.",
+    location: "3750 W 4th Ave, Vancouver, BC V6R 1P3",
+    effortLevel: 1,
+    schedule: "Thursday Afternoon",
+    timeRange: "12pm-2pm",
+    cost: "$5",
+    transitSupport: "3750 W 4th Ave, Vancouver, BC V6R 1P3",
+    beginnerFriendly: true,
+    impact: "Creates low-pressure opportunities for social connection",
+    whyItHelps:
+        "No structure, no expectations — just a space to be around others in a relaxed setting.",
+    barrierSupport: ["Drop-in anytime", "Leave whenever you want"],
+    tags: ["OK to come alone", "Quiet", "small group"],
+    builds: ["Social confidence", "Comfort", "Routine"],
+    skills: ["Conversation", "Presence"],
+    nextStepLabel: "Stop by",
+    activities: [
+        "Sit and enjoy a coffee or tea",
+        "Chat casually if you feel like it",
+        "Observe and ease into the space",
+    ],
+    website: "https://www.breka.ca",
+    contactName: "Community Host",
+    contactEmail: "info@breka.ca",
+    image: coffeeMeet,
+},
+{
+    id: 7,
+    title: "Park Yoga",
+    organization: "Pacific Spirit Regional Park",
+    description:
+        "A gentle yoga class focused on stretching, breathing, and relaxation. No experience needed.",
+    location: "5495 Chancellor Blvd, Vancouver, BC V6T 1E4",
+    effortLevel: 2,
+    schedule: "Saturday",
+    timeRange: "10am-11am",
+    cost: "Free",
+    transitSupport: "5495 Chancellor Blvd, Vancouver, BC V6T 1E4",
+    beginnerFriendly: true,
+    impact: "Supports mental and physical wellness",
+    whyItHelps:
+        "Structured but calm — you can follow along without needing to interact with others.",
+    barrierSupport: ["Beginner-friendly", "Instructor-led guidance"],
+    tags: ["Quiet", "small group"],
+    builds: ["Routine", "Body awareness", "Calmness"],
+    skills: ["Stretching", "Breathing techniques"],
+    nextStepLabel: "Try a class",
+    activities: [
+        "Follow guided yoga movements",
+        "Practice breathing exercises",
+        "Relax at your own pace",
+    ],
+    website: "https://metrovancouver.org/services/regional-parks/park/pacific-spirit-regional-park",
+    contactName: "Metro Vancouver",
+    contactEmail: "regionalparks.info@metrovancouver.org",
+    image: yoga,
+}
 ];
 
 export default opportunities;
