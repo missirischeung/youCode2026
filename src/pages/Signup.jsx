@@ -29,23 +29,29 @@ function Signup() {
 
     return (
         <div className="signup-page">
-            <Container>
+            <Container className="signup-container">
                 <Row className="justify-content-center align-items-center min-vh-100">
                     <Col xs={12} md={8} lg={5}>
                         <Card className="signup-card">
-                            <Card.Body className="p-4">
-                                <h2 className="text-center mb-4">Sign Up</h2>
+                            <Card.Body className="p-4 p-md-5">
+                                <div className="signup-badge">New here?</div>
+
+                                <h2 className="signup-title">Join us</h2>
+                                <p className="signup-subtitle">
+                                    Create your account and start building your profile.
+                                </p>
 
                                 {error && (
-                                    <div className="alert alert-danger py-2" role="alert">
+                                    <div className="alert alert-danger py-2 mt-3" role="alert">
                                         {error}
                                     </div>
                                 )}
 
-                                <Form onSubmit={handleSignup}>
+                                <Form onSubmit={handleSignup} className="mt-4">
                                     <Form.Group className="mb-3">
-                                        <Form.Label>Email</Form.Label>
+                                        <Form.Label className="signup-label">Email</Form.Label>
                                         <Form.Control
+                                            className="signup-input"
                                             type="email"
                                             value={email}
                                             onChange={(e) => setEmail(e.target.value)}
@@ -54,23 +60,28 @@ function Signup() {
                                     </Form.Group>
 
                                     <Form.Group className="mb-3">
-                                        <Form.Label>Password</Form.Label>
+                                        <Form.Label className="signup-label">Password</Form.Label>
                                         <Form.Control
+                                            className="signup-input"
                                             type="password"
-                                            value={password}
+                                            value={email}
                                             onChange={(e) => setPassword(e.target.value)}
                                             required
                                         />
                                     </Form.Group>
 
-                                    <Button variant="dark" className="w-100" type="submit" disabled={loading}>
+                                    <Button
+                                        className="signup-button w-100 mt-2"
+                                        type="submit"
+                                        disabled={loading}
+                                    >
                                         {loading ? 'Creating account…' : 'Create Account'}
                                     </Button>
                                 </Form>
 
-                                <div className="text-center mt-3" style={{ fontSize: '0.95rem', color: '#64748b' }}>
+                                <div className="signup-footer mt-3">
                                     Already have an account?{' '}
-                                    <Link to="/login" style={{ color: '#8a6fb0', textDecoration: 'none', fontWeight: 500 }}>
+                                    <Link to="/login" className="signup-link">
                                         Log in
                                     </Link>
                                 </div>

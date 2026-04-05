@@ -34,7 +34,7 @@ function Login() {
                     <Col xs={12} md={10} lg={6} xl={5}>
                         <Card className="login-card shadow-sm">
                             <Card.Body className="p-4 p-md-5">
-                                <div className="login-badge">Foursight</div>
+                                <div className="login-badge">FourSight</div>
 
                                 <h1 className="login-title">
                                     Welcome back

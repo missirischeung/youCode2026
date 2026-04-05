@@ -1,334 +1,335 @@
-.opportunity-card {
-    --oc-rose: #c97f97;
-    --oc-rose-dark: #a85f79;
-    --oc-rose-soft: #f7eef2;
-  
-    --oc-blush: #fbf6f8;
-    --oc-blush-2: #f9f1f4;
-  
-    --oc-cream: #fcf9fa;
-    --oc-border: #ead7df;
-    --oc-text: #4d3b43;
-    --oc-muted: #8a6e79;
-  
-    --oc-pill-1-bg: #f5e9ee;
+/* ─── Tokens ─────────────────────────────────────────────── */
+.oc-card {
+    --oc-rose:        #c97f97;
+    --oc-rose-dark:   #a85f79;
+    --oc-rose-soft:   #f7eef2;
+    --oc-blush:       #fffdfd;
+    --oc-cream:       #fff8fa;
+    --oc-border:      #ead7df;
+    --oc-text:        #4d3b43;
+    --oc-muted:       #8a6e79;
+
+    --oc-pill-1-bg:   #f5e9ee;
     --oc-pill-1-text: #9c5f76;
-  
-    --oc-pill-2-bg: #f8efe3;
+    --oc-pill-2-bg:   #f8efe3;
     --oc-pill-2-text: #9a7450;
-  
-    --oc-pill-3-bg: #efe8f6;
+    --oc-pill-3-bg:   #efe8f6;
     --oc-pill-3-text: #7f6497;
-  
-    width: 100%;
-    border: 1px solid var(--oc-border) !important;
-    border-radius: 24px !important;
-    background: #fffdfd !important;
-    overflow: hidden;
-    box-shadow: 0 10px 28px rgba(114, 72, 90, 0.08);
-    transition: transform 0.16s ease, box-shadow 0.16s ease;
-  }
-  
-  .opportunity-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 14px 34px rgba(114, 72, 90, 0.12);
-  }
-  
-  .opportunity-accent-bar {
-    height: 7px;
-    background: linear-gradient(90deg, #d99bb0, #f3dbe4);
-  }
-  
-  .opportunity-body {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 28px;
-    padding: 24px !important;
-    text-align: left;
-  }
-  
-  .opportunity-main {
-    flex: 1;
-    min-width: 0;
-    text-align: left;
-  }
-  
-  .opportunity-side {
-    width: 230px;
-    flex-shrink: 0;
+}
+
+/* ─── Card shell ─────────────────────────────────────────── */
+.oc-card {
+    background: var(--oc-blush);
+    border-radius: 0;           /* modal handles rounding */
     display: flex;
     flex-direction: column;
-    gap: 14px;
-    text-align: left;
-  }
-  
-  .opportunity-top {
+    font-family: 'DM Sans', 'Segoe UI', sans-serif;
+    overflow: hidden;
+}
+
+/* ─── Accent bar ─────────────────────────────────────────── */
+.oc-accent-bar {
+    height: 6px;
+    flex-shrink: 0;
+    background: linear-gradient(90deg, #d99bb0, #f3dbe4);
+}
+
+/* ─── Header ─────────────────────────────────────────────── */
+.oc-header {
     display: flex;
-    justify-content: space-between;
     align-items: flex-start;
+    justify-content: space-between;
     gap: 16px;
-    margin-bottom: 14px;
-  }
-  
-  .opportunity-title-block {
-    min-width: 0;
+    padding: 22px 24px 14px;
+}
+
+.oc-title-group {
     flex: 1;
-    text-align: left;
-  }
-  
-  .opportunity-org {
-    margin: 0 0 6px 0;
-    font-size: 0.82rem;
-    color: var(--oc-muted);
+    min-width: 0;
+}
+
+.oc-org {
+    margin: 0 0 5px;
+    font-size: 0.78rem;
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-  }
-  
-  .opportunity-title {
+    color: var(--oc-muted);
+    overflow-wrap: break-word;
+}
+
+.oc-title {
     margin: 0;
-    font-size: 1.65rem;
-    line-height: 1.2;
-    color: var(--oc-text);
+    font-size: 1.55rem;
     font-weight: 650;
-    text-align: left;
-  }
-  
-  .opportunity-badges {
+    line-height: 1.22;
+    color: var(--oc-text);
+    overflow-wrap: break-word;
+}
+
+.oc-header-badges {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-    gap: 8px;
-    max-width: 240px;
-  }
-  
-  .opportunity-badge {
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+/* effort badge — colour set by effort-level class on .oc-card */
+.oc-effort-badge {
     display: inline-flex;
     align-items: center;
-    padding: 0.42rem 0.8rem;
+    padding: 0.38rem 0.78rem;
     border-radius: 10px;
-    font-size: 0.8rem;
+    font-size: 0.78rem;
     font-weight: 700;
     white-space: nowrap;
-  }
+}
 
-  .opportunity-badge--time {
+.effort-level--1 .oc-effort-badge { background: var(--oc-pill-1-bg); color: var(--oc-pill-1-text); }
+.effort-level--2 .oc-effort-badge { background: var(--oc-pill-2-bg); color: var(--oc-pill-2-text); }
+.effort-level--3 .oc-effort-badge { background: var(--oc-pill-3-bg); color: var(--oc-pill-3-text); }
+
+.oc-time-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0.34rem 0.68rem;
+    border-radius: 10px;
+    font-size: 0.75rem;
+    font-weight: 600;
     background: #f6eef2;
     color: #7a4f60;
-    border: 1px solid #ead7df;
-  }
-  
-  .effort-level--1 .opportunity-badge--effort {
-    background: var(--oc-pill-1-bg);
-    color: var(--oc-pill-1-text);
-  }
-  
-  .effort-level--2 .opportunity-badge--effort {
-    background: var(--oc-pill-2-bg);
-    color: var(--oc-pill-2-text);
-  }
-  
-  .effort-level--3 .opportunity-badge--effort {
-    background: var(--oc-pill-3-bg);
-    color: var(--oc-pill-3-text);
-  }
-  
-  .opportunity-description {
-    margin: 0 0 16px 0;
-    font-size: 1rem;
-    line-height: 1.65;
-    color: var(--oc-text);
-    text-align: left;
-  }
-  
-  .opportunity-impact-box {
-    background: var(--oc-cream);
-    border: 1px solid #eddce3;
-    border-left: 4px solid #d89ab0;
-    border-radius: 14px;
-    padding: 14px 16px;
-    margin-bottom: 16px;
-    text-align: left;
-  }
-  
-  .opportunity-impact-line {
+    border: 1px solid var(--oc-border);
+    white-space: nowrap;
+}
+
+/* ─── Pill nav ───────────────────────────────────────────── */
+.oc-pill-nav {
+    display: flex;
+    gap: 6px;
+    padding: 0 24px 14px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    flex-shrink: 0;
+}
+
+.oc-pill-nav::-webkit-scrollbar { display: none; }
+
+.oc-pill-btn {
+    padding: 7px 16px;
+    border-radius: 20px;
+    border: 1.5px solid var(--oc-border);
+    background: #fff;
+    color: var(--oc-muted);
+    font-size: 0.82rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: all 0.15s ease;
+}
+
+.oc-pill-btn:hover {
+    border-color: var(--oc-rose);
+    color: var(--oc-rose-dark);
+}
+
+.oc-pill-btn.active {
+    background: var(--oc-rose-soft);
+    color: var(--oc-rose-dark);
+    border-color: #d9b1c1;
+}
+
+/* ─── Panel ──────────────────────────────────────────────── */
+.oc-panel {
+    border-top: 1px solid var(--oc-border);
+    min-height: 180px;
+    flex: 1;
+}
+
+.oc-section {
+    padding: 20px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.oc-section-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--oc-muted);
     margin: 0;
+}
+
+.oc-body-text {
+    font-size: 0.97rem;
     color: var(--oc-text);
-    font-size: 0.96rem;
+    line-height: 1.65;
+    margin: 0;
+    overflow-wrap: break-word;
+}
+
+/* italic "why it helps" callout */
+.oc-why-box {
+    background: var(--oc-cream);
+    border-left: 3px solid #d99bb0;
+    border-radius: 0 10px 10px 0;
+    padding: 12px 16px;
+    font-size: 0.93rem;
+    color: var(--oc-text);
     line-height: 1.6;
-  }
-  
-  .opportunity-impact-line + .opportunity-impact-line {
-    margin-top: 7px;
-  }
-  
-  .impact-label {
+    font-style: italic;
+    overflow-wrap: break-word;
+}
+
+.oc-impact-line {
+    font-size: 0.93rem;
+    color: var(--oc-text);
+    margin: 0;
+    line-height: 1.55;
+    overflow-wrap: break-word;
+}
+
+.oc-impact-label {
     font-weight: 700;
     color: var(--oc-rose-dark);
-  }
-  
-  .opportunity-chip-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 12px;
-    justify-content: flex-start;
-  }
-  
-  .opportunity-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    padding: 0.48rem 0.78rem;
-    border-radius: 10px;
-    background: var(--oc-blush-2);
-    color: var(--oc-text);
-    font-size: 0.9rem;
-    border: 1px solid var(--oc-border);
-  }
-  
-  .opportunity-chip--soft {
-    background: #fcf6f8;
-  }
-  
-  .opportunity-chip-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--oc-rose-dark);
-    flex-shrink: 0;
-  }
+}
 
-  .detail-link {
-    text-decoration: none;
-    color: #a85f79;
-    font-weight: 600;
-  }
-  
-  .detail-link:hover {
-    text-decoration: underline;
-  }
-  
-  .opportunity-support-note {
-    margin-bottom: 12px;
-    font-size: 0.93rem;
+/* ─── Info grid (logistics tab) ──────────────────────────── */
+.oc-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.oc-info-cell {
+    background: var(--oc-cream);
+    border: 1px solid var(--oc-border);
+    border-radius: 12px;
+    padding: 11px 13px;
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+}
+
+.oc-info-cell-icon {
+    color: var(--oc-rose-dark);
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+
+.oc-info-label {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
     color: var(--oc-muted);
-    line-height: 1.55;
-    text-align: left;
-  }
-  
-  .opportunity-builds {
-    margin-bottom: 12px;
+    margin-bottom: 2px;
+}
+
+.oc-info-value {
+    display: block;
+    font-size: 0.93rem;
+    color: var(--oc-text);
+    font-weight: 500;
+    line-height: 1.35;
+    overflow-wrap: break-word;
+}
+
+/* ─── Good to know (barriers tab) ───────────────────────── */
+.oc-good-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.oc-good-item {
+    display: flex;
+    align-items: center;
+    gap: 11px;
     font-size: 0.95rem;
     color: var(--oc-text);
-    line-height: 1.5;
-    text-align: left;
-  }
-  
-  .builds-label {
+    line-height: 1.4;
+}
+
+.oc-good-dot {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
     font-weight: 700;
-    color: var(--oc-rose-dark);
-  }
-  
-  .skills-section {
-    margin-top: 6px;
-  }
-  
-  .skills-list {
+    flex-shrink: 0;
+}
+
+.oc-good-dot--green { background: #eaf3e6; color: #2d5e26; }
+.oc-good-dot--amber { background: #fdf7ec; color: #7a5c1e; }
+
+/* ─── Skills tab ─────────────────────────────────────────── */
+.oc-skills-row {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
-    justify-content: flex-start;
-  }
-  
-  .skill-badge {
+}
+
+.oc-skill-badge {
     background: #faf1f5 !important;
     color: var(--oc-rose-dark) !important;
     border: 1px solid var(--oc-border) !important;
     border-radius: 10px !important;
-    padding: 0.45rem 0.75rem !important;
+    padding: 0.42rem 0.78rem !important;
     font-size: 0.82rem !important;
     font-weight: 600 !important;
-  }
-  
-  .opportunity-side-card {
-    background: #fff8fa;
-    border: 1px solid var(--oc-border);
-    border-radius: 16px;
-    padding: 16px;
-    text-align: left;
-  }
-  
-  .opportunity-side-row + .opportunity-side-row {
-    margin-top: 14px;
-  }
-  
-  .detail-label {
-    display: block;
-    margin-bottom: 3px;
-    font-size: 0.74rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--oc-muted);
-    font-weight: 700;
-  }
-  
-  .detail-value {
-    display: block;
-    font-size: 0.97rem;
-    color: var(--oc-text);
-    line-height: 1.45;
-    text-align: left;
-  }
-  
-  .opportunity-button {
-    width: 100%;
-    border: 1px solid #d9b1c1 !important;
-    border-radius: 14px !important;
-    background: #ffffff !important;
-    color: var(--oc-text) !important;
-    font-weight: 700 !important;
-    font-size: 1rem !important;
-    padding: 0.82rem 1rem !important;
-    box-shadow: none !important;
-    transition: all 0.15s ease !important;
-  }
-  
-  .opportunity-button:hover,
-  .opportunity-button:focus,
-  .opportunity-button:active {
-    background: var(--oc-rose) !important;
-    color: #ffffff !important;
-    border-color: var(--oc-rose) !important;
-  }
-  
-  .opportunity-title,
-  .opportunity-org,
-  .opportunity-description,
-  .detail-value,
-  .opportunity-impact-line,
-  .opportunity-support-note,
-  .opportunity-builds {
-    overflow-wrap: break-word;
-    word-break: normal;
-  }
-  
-  @media (max-width: 900px) {
-    .opportunity-body {
-      flex-direction: column;
-    }
-  
-    .opportunity-side {
-      width: 100%;
-    }
-  
-    .opportunity-top {
-      flex-direction: column;
-    }
-  
-    .opportunity-badges {
-      justify-content: flex-start;
-    }
-  }
+}
 
+/* ─── Footer ─────────────────────────────────────────────── */
+.oc-footer {
+    padding: 16px 24px 20px;
+    border-top: 1px solid var(--oc-border);
+    display: flex;
+    justify-content: flex-end;
+    flex-shrink: 0;
+}
+
+.oc-commit-btn {
+    padding: 0.72rem 2rem !important;
+    border-radius: 14px !important;
+    background: var(--oc-rose) !important;
+    border: none !important;
+    color: #fff !important;
+    font-weight: 700 !important;
+    font-size: 0.97rem !important;
+    transition: background 0.15s ease, transform 0.1s ease !important;
+    box-shadow: none !important;
+}
+
+.oc-commit-btn:hover:not(:disabled) {
+    background: var(--oc-rose-dark) !important;
+}
+
+.oc-commit-btn:active:not(:disabled) {
+    transform: scale(0.97) !important;
+}
+
+.oc-commit-btn:disabled {
+    background: #e8d0d8 !important;
+    color: #b89aa4 !important;
+    cursor: default !important;
+}
+
+/* ─── Responsive ─────────────────────────────────────────── */
+@media (max-width: 600px) {
+    .oc-header   { padding: 16px 18px 12px; }
+    .oc-pill-nav { padding: 0 18px 12px; }
+    .oc-section  { padding: 16px 18px; }
+    .oc-footer   { padding: 14px 18px 18px; }
+    .oc-info-grid { grid-template-columns: 1fr; }
+    .oc-title    { font-size: 1.3rem; }
+}
