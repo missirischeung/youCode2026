@@ -103,6 +103,7 @@ function Dashboard({ searchQuery = '' }) {
                             {...selectedOpportunity}
                             onCommit={handleCommit}
                             isCommitted={committedIds.includes(selectedOpportunity.id)}
+                            onClose={() => setSelectedOpportunity(null)}
                         />
                     )}
                 </Modal.Body>

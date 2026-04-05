@@ -1,27 +1,24 @@
 /* ─── Tokens ─────────────────────────────────────────────── */
 .oc-card {
-    --oc-rose: #c97f97;
-    --oc-rose-dark: #a85f79;
-    --oc-rose-soft: #f7eef2;
-    --oc-blush: #fffdfd;
-    --oc-cream: #fff8fa;
-    --oc-border: #ead7df;
-    --oc-text: #4d3b43;
-    --oc-muted: #8a6e79;
-
-    --oc-pill-1-bg: #f5e9ee;
-    --oc-pill-1-text: #9c5f76;
-    --oc-pill-2-bg: #f8efe3;
-    --oc-pill-2-text: #9a7450;
-    --oc-pill-3-bg: #efe8f6;
-    --oc-pill-3-text: #7f6497;
+    --oc-rose:         #c97f97;
+    --oc-rose-dark:    #a85f79;
+    --oc-rose-soft:    #f7eef2;
+    --oc-sage:         #9caf88;
+    --oc-sage-dark:    #6f8662;
+    --oc-sage-soft:    #eef4ea;
+    --oc-sage-border:  #d7e4d0;
+    --oc-blush:        #fffdfd;
+    --oc-cream:        #fff8fa;
+    --oc-border:       #ead7df;
+    --oc-text:         #4d3b43;
+    --oc-muted:        #8a6e79;
+    --oc-tab-inactive: #eddde6;
 }
 
 /* ─── Card shell ─────────────────────────────────────────── */
 .oc-card {
     background: var(--oc-blush);
     border-radius: 0;
-    /* modal handles rounding */
     display: flex;
     flex-direction: column;
     font-family: 'DM Sans', 'Segoe UI', sans-serif;
@@ -39,10 +36,54 @@
 /* ─── Header ─────────────────────────────────────────────── */
 .oc-header {
     display: flex;
-    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+    padding: 16px 20px 14px;
+}
+
+/* top row: time badge left, X button right */
+.oc-header-top {
+    display: flex;
+    align-items: center;
     justify-content: space-between;
-    gap: 16px;
-    padding: 22px 24px 14px;
+}
+
+.oc-time-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0.42rem 0.8rem;
+    border-radius: 11px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    background: linear-gradient(180deg, #f3f8ef 0%, #e6efe0 100%);
+    color: var(--oc-sage-dark);
+    border: 1px solid #c7d8be;
+    white-space: nowrap;
+    box-shadow: 0 4px 12px rgba(111, 134, 98, 0.08);
+}
+
+.oc-close-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1.5px solid var(--oc-border);
+    background: transparent;
+    color: var(--oc-muted);
+    font-size: 0.8rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s ease, color 0.15s ease; 
+    font-family: inherit;
+    line-height: 1;
+}
+
+.oc-close-btn:hover {
+    background: #f5e8ef;
+    color: var(--oc-rose-dark);
+    border-color: var(--oc-rose-dark);
 }
 
 .oc-title-group {
@@ -75,25 +116,17 @@
     gap: 6px;
     margin-top: 10px;
     color: var(--oc-rose-dark);
-    font-size: 0.95rem;
-    font-weight: 500;
+    font-size: 0.96rem;
+    font-weight: 600;
     text-decoration: underline;
     text-underline-offset: 3px;
-    text-decoration-color: rgba(168, 95, 121, 0.35);
+    text-decoration-color: rgba(143, 77, 104, 0.35);
     width: fit-content;
 }
 
 .oc-location-link:hover {
-    color: var(--oc-rose);
-    text-decoration-color: var(--oc-rose);
-}
-
-.oc-header-badges {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 6px;
-    flex-shrink: 0;
+    color: #7f425a;
+    text-decoration-color: #7f425a;
 }
 
 .oc-quick-tags {
@@ -122,65 +155,32 @@
     flex-shrink: 0;
 }
 
-/* effort badge — colour set by effort-level class on .oc-card */
-.oc-effort-badge {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.38rem 0.78rem;
-    border-radius: 10px;
-    font-size: 0.78rem;
-    font-weight: 700;
-    white-space: nowrap;
-}
-
-.effort-level--1 .oc-effort-badge {
-    background: var(--oc-pill-1-bg);
-    color: var(--oc-pill-1-text);
-}
-
-.effort-level--2 .oc-effort-badge {
-    background: var(--oc-pill-2-bg);
-    color: var(--oc-pill-2-text);
-}
-
-.effort-level--3 .oc-effort-badge {
-    background: var(--oc-pill-3-bg);
-    color: var(--oc-pill-3-text);
-}
-
-.oc-time-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 0.34rem 0.68rem;
-    border-radius: 10px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    background: #f6eef2;
-    color: #7a4f60;
-    border: 1px solid var(--oc-border);
-    white-space: nowrap;
-}
-
-/* ─── Pill nav ───────────────────────────────────────────── */
-.oc-pill-nav {
+/* ─── Binder tabs ────────────────────────────────────────── */
+/*
+  Tabs sit inside the card, just above the panel border.
+  Inactive tabs are slightly lowered (translateY 3px) and use
+  a darker blush background so they read as "behind" the card.
+  The active tab lifts flush, turns white, and its bottom border
+  disappears — making it look physically joined to the panel below.
+*/
+.oc-binder-nav {
     display: flex;
-    gap: 6px;
-    padding: 0 24px 14px;
+    align-items: flex-end;
+    gap: 4px;
+    padding: 0 20px;
+    flex-shrink: 0;
     overflow-x: auto;
     scrollbar-width: none;
-    flex-shrink: 0;
 }
 
-.oc-pill-nav::-webkit-scrollbar {
-    display: none;
-}
+.oc-binder-nav::-webkit-scrollbar { display: none; }
 
-.oc-pill-btn {
-    padding: 7px 16px;
-    border-radius: 20px;
+.oc-binder-tab {
+    padding: 8px 18px 12px;
+    border-radius: 10px 10px 0 0;
     border: 1.5px solid var(--oc-border);
-    background: #fff;
+    border-bottom: none;
+    background: var(--oc-tab-inactive);
     color: var(--oc-muted);
     font-size: 0.82rem;
     font-weight: 600;
@@ -188,25 +188,52 @@
     cursor: pointer;
     white-space: nowrap;
     flex-shrink: 0;
-    transition: all 0.15s ease;
+    position: relative;
+    transform: translateY(3px);
+    transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+    /* bottom cover — hides the panel border under the active tab */
+    z-index: 1;
 }
 
-.oc-pill-btn:hover {
-    border-color: var(--oc-rose);
+.oc-binder-tab:hover {
+    background: #f5e8ef;
     color: var(--oc-rose-dark);
 }
 
-.oc-pill-btn.active {
-    background: var(--oc-rose-soft);
-    color: var(--oc-rose-dark);
-    border-color: #d9b1c1;
+.oc-binder-tab.active {
+    background: var(--oc-blush);
+    color: var(--oc-text);
+    border-color: var(--oc-border);
+    transform: translateY(0);
+    font-weight: 700;
+    z-index: 3;
+}
+
+/* white strip that sits over the panel's top border under the active tab */
+.oc-binder-tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--oc-blush);
+    z-index: 4;
 }
 
 /* ─── Panel ──────────────────────────────────────────────── */
 .oc-panel {
-    border-top: 1px solid var(--oc-border);
-    min-height: 320px;
+    border-top: 1.5px solid var(--oc-border);
+    min-height: 280px;
     flex: 1;
+    position: relative;
+    z-index: 2;
+    animation: oc-fade-slide 0.22s ease both;
+}
+
+@keyframes oc-fade-slide {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0);   }
 }
 
 .oc-section {
@@ -233,10 +260,15 @@
     overflow-wrap: break-word;
 }
 
-/* italic "why it helps" callout */
+.oc-muted-text {
+    color: var(--oc-muted);
+    font-style: italic;
+}
+
+/* why it helps callout */
 .oc-why-box {
-    background: var(--oc-cream);
-    border-left: 3px solid #d99bb0;
+    background: var(--oc-sage-soft);
+    border-left: 3px solid var(--oc-sage);
     border-radius: 0 10px 10px 0;
     padding: 12px 16px;
     font-size: 0.93rem;
@@ -266,24 +298,49 @@
     line-height: 1.55;
 }
 
-.oc-contact-card {
-    margin-top: 4px;
-    background: var(--oc-cream);
-    border: 1px solid var(--oc-border);
-    border-radius: 14px;
-    padding: 14px 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+.oc-impact-line {
+    font-size: 0.93rem;
+    color: var(--oc-text);
+    margin: 0;
+    line-height: 1.55;
+    overflow-wrap: break-word;
 }
 
-.oc-contact-card-title {
-    margin: 0;
-    font-size: 0.78rem;
+.oc-impact-label {
     font-weight: 700;
-    letter-spacing: 0.07em;
-    text-transform: uppercase;
-    color: var(--oc-muted);
+    color: var(--oc-rose-dark);
+}
+
+/* contact dropdown */
+.oc-contact-dropdown {
+    background: var(--oc-cream);
+    border: 1px solid var(--oc-border);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.oc-contact-summary {
+    padding: 11px 14px;
+    font-size: 0.86rem;
+    font-weight: 600;
+    color: var(--oc-rose-dark);
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+}
+
+.oc-contact-summary::-webkit-details-marker { display: none; }
+.oc-contact-summary::before {
+    content: '▸ ';
+    font-size: 0.75rem;
+}
+details[open] .oc-contact-summary::before { content: '▾ '; }
+
+.oc-contact-dropdown-body {
+    padding: 0 14px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 .oc-contact-row {
@@ -304,7 +361,6 @@
     font-size: 0.92rem;
     color: var(--oc-text);
     font-weight: 500;
-    text-align: right;
 }
 
 .oc-contact-link {
@@ -312,68 +368,46 @@
     font-weight: 600;
     color: var(--oc-rose-dark);
     text-decoration: none;
-    border-bottom: 1px solid transparent;
 }
 
-.oc-contact-link:hover {
-    color: var(--oc-rose);
-    border-bottom-color: var(--oc-rose);
+.oc-contact-link:hover { color: var(--oc-rose); text-decoration: underline; }
+
+/* ─── When & where (logistics tab) ──────────────────────── */
+.oc-direction-block {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
 }
 
-.oc-impact-line {
-    font-size: 0.93rem;
-    color: var(--oc-text);
-    margin: 0;
-    line-height: 1.55;
-    overflow-wrap: break-word;
-}
-
-.oc-impact-label {
-    font-weight: 700;
-    color: var(--oc-rose-dark);
-}
-
-/* ─── Info grid (logistics tab) ──────────────────────────── */
-.oc-info-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-}
-
-.oc-info-cell {
-    background: var(--oc-cream);
-    border: 1px solid var(--oc-border);
-    border-radius: 12px;
-    padding: 11px 13px;
+.oc-direction-card {
     display: flex;
     align-items: flex-start;
-    gap: 9px;
+    gap: 11px;
+    background: #fbfdf9;
+    border: 1px solid var(--oc-sage-border);
+    border-radius: 12px;
+    padding: 12px 14px;
 }
 
-.oc-info-cell-icon {
-    color: var(--oc-rose-dark);
-    margin-top: 2px;
+.oc-direction-icon {
+    color: var(--oc-sage-dark);
     flex-shrink: 0;
+    margin-top: 2px;
 }
 
-.oc-info-label {
-    display: block;
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 0.07em;
-    text-transform: uppercase;
-    color: var(--oc-muted);
-    margin-bottom: 2px;
+.oc-map-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--oc-rose-dark);
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    margin-top: 4px;
+    width: fit-content;
 }
 
-.oc-info-value {
-    display: block;
-    font-size: 0.93rem;
-    color: var(--oc-text);
-    font-weight: 500;
-    line-height: 1.35;
-    overflow-wrap: break-word;
-}
+.oc-map-link:hover { color: var(--oc-rose); text-decoration: underline; }
 
 /* ─── Good to know (barriers tab) ───────────────────────── */
 .oc-good-list {
@@ -403,15 +437,8 @@
     flex-shrink: 0;
 }
 
-.oc-good-dot--green {
-    background: #eaf3e6;
-    color: #2d5e26;
-}
-
-.oc-good-dot--amber {
-    background: #fdf7ec;
-    color: #7a5c1e;
-}
+.oc-good-dot--green { background: #eaf3e6; color: #2d5e26; }
+.oc-good-dot--amber { background: #fdf7ec; color: #7a5c1e; }
 
 /* ─── Skills tab ─────────────────────────────────────────── */
 .oc-skills-row {
@@ -431,7 +458,6 @@
     font-size: 0.83rem;
     font-weight: 600;
     letter-spacing: 0.01em;
-    box-shadow: 0 2px 8px rgba(201, 127, 151, 0.06);
     line-height: 1.2;
 }
 
@@ -445,66 +471,76 @@
 }
 
 .oc-commit-btn {
-    padding: 0.72rem 2rem;
-    border-radius: 14px;
-    background: var(--oc-rose);
-    border: none;
+    position: relative;
+    min-width: 280px;
+    height: 62px;
+    padding: 0 2rem;
+    border-radius: 16px;
+    border: 1.5px solid transparent;
+    background: linear-gradient(135deg, var(--oc-rose) 0%, #b86f8a 100%);
     color: #fff;
     font-weight: 700;
-    font-size: 0.97rem;
-    transition: background 0.15s ease, transform 0.1s ease;
-    box-shadow: none;
+    font-size: 0.98rem;
     cursor: pointer;
+    overflow: hidden;
+    transition: background 0.22s ease, transform 0.12s ease, box-shadow 0.22s ease;
+    box-shadow: 0 10px 24px rgba(169, 95, 121, 0.18);
 }
 
 .oc-commit-btn:hover:not(:disabled) {
-    background: var(--oc-rose-dark);
+    background: linear-gradient(135deg, var(--oc-rose-dark) 0%, #8d5168 100%);
+    box-shadow: 0 14px 28px rgba(169, 95, 121, 0.22);
 }
 
-.oc-commit-btn:active:not(:disabled) {
-    transform: scale(0.97);
+.oc-commit-btn:active:not(:disabled) { transform: scale(0.975); }
+
+.oc-commit-btn-inner {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.oc-commit-btn-text {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.24s ease;
+    will-change: transform, opacity;
+}
+
+.oc-commit-btn-text.is-visible  { opacity: 1; transform: translateY(0);     }
+.oc-commit-btn-text.is-hidden   { opacity: 0; transform: translateY(120%);  }
+.oc-commit-btn-text--alt.is-hidden { transform: translateY(-120%);          }
+
+.oc-commit-btn--committed {
+    background: linear-gradient(135deg, #eef4ea 0%, #dbe8d3 100%) !important;
+    color: var(--oc-sage-dark) !important;
+    border-color: #bfd1b4 !important;
+    box-shadow: 0 10px 24px rgba(111, 134, 98, 0.14);
+}
+
+.oc-commit-btn--committed:hover {
+    background: linear-gradient(135deg, #e4efdc 0%, #cfdfc5 100%) !important;
 }
 
 .oc-commit-btn:disabled {
     background: #e8d0d8;
     color: #b89aa4;
     cursor: default;
-}
-
-.oc-commit-btn--committed {
-    background: #fff0f3 !important;
-    color: #b44f68 !important;
-    border: 1.5px solid #f0bcc8 !important;
-}
-
-.oc-commit-btn--committed:hover {
-    background: #fce0e6 !important;
-    color: #9e3550 !important;
+    box-shadow: none;
 }
 
 /* ─── Responsive ─────────────────────────────────────────── */
 @media (max-width: 600px) {
-    .oc-header {
-        padding: 16px 18px 12px;
-    }
-
-    .oc-pill-nav {
-        padding: 0 18px 12px;
-    }
-
-    .oc-section {
-        padding: 16px 18px;
-    }
-
-    .oc-footer {
-        padding: 14px 18px 18px;
-    }
-
-    .oc-info-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .oc-title {
-        font-size: 1.3rem;
-    }
+    .oc-header      { padding: 16px 18px 12px; }
+    .oc-binder-nav  { padding: 0 14px; }
+    .oc-binder-tab  { padding: 7px 13px 11px; font-size: 0.78rem; }
+    .oc-section     { padding: 16px 18px; }
+    .oc-footer      { padding: 14px 18px 18px; }
+    .oc-title       { font-size: 1.3rem; }
+    .oc-commit-btn  { min-width: 0; width: 100%; }
 }

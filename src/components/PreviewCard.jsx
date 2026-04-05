@@ -86,14 +86,8 @@ function PreviewCard({
                     </div>
 
                     <div className="preview-card-badges">
-                        <span className="preview-card-effort">
-                            {effort.label}
-                        </span>
-
                         {duration && (
-                            <span className="preview-card-time">
-                                Req Time: {duration}
-                            </span>
+                            <span className="oc-time-badge">Time Commitment ⏱: {duration}</span>
                         )}
                     </div>
                 </div>
