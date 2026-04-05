@@ -24,6 +24,15 @@ const opportunities = [
         builds: ["Cooking basics", "Teamwork", "Confidence"],
         skills: ["Cooking basics", "Teamwork", "Confidence"],
         nextStepLabel: "I'm in",
+        activities: [
+            "Help prep ingredients for the community meal",
+            "Serve food and greet neighbours during the drop-in",
+            "Tidy shared kitchen stations after service",
+          ],
+          
+          website: "https://sunrise.example.org",
+          contactName: "Maya Chen",
+          contactEmail: "maya@sunrise.org",
     },
 
     {
@@ -47,6 +56,15 @@ const opportunities = [
         builds: ["Routine", "Confidence", "Responsibility"],
         skills: ["Gardening basics", "Teamwork"],
         nextStepLabel: "I'm in",
+        activities: [
+            "Help prep ingredients for the community meal",
+            "Serve food and greet neighbours during the drop-in",
+            "Tidy shared kitchen stations after service",
+          ],
+          
+          website: "https://sunrise.example.org",
+          contactName: "Maya Chen",
+          contactEmail: "maya@sunrise.org",
     },
 ];
 
