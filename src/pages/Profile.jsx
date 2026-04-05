@@ -37,7 +37,6 @@ const GENDER_OPTIONS = [
     'Other',
 ]
 
-// Reusable bubble component
 function Bubble({ label, onRemove }) {
     return (
         <span
@@ -84,15 +83,18 @@ function Profile() {
     const [saving, setSaving] = useState(false)
     const [error, setError] = useState('')
     const [success, setSuccess] = useState('')
-    const [registered, setRegistered] = useState([])
     const [userId, setUserId] = useState(null)
+
+    // future_events IDs (registered, not yet completed)
+    const [futureIds, setFutureIds] = useState([])
+    // event_history IDs (completed)
+    const [historyIds, setHistoryIds] = useState([])
 
     // Avatar
     const [avatarUrl, setAvatarUrl] = useState(null)
     const [avatarUploading, setAvatarUploading] = useState(false)
     const fileInputRef = useRef(null)
 
-    // Snapshot of profile before editing (used by Cancel to revert)
     const savedProfileRef = useRef(null)
 
     // Bubble inputs
@@ -102,11 +104,7 @@ function Profile() {
     useEffect(() => {
         const fetchProfile = async () => {
             const { data: { user } } = await supabase.auth.getUser()
-
-            if (!user) {
-                setLoading(false)
-                return
-            }
+            if (!user) { setLoading(false); return }
 
             setUserId(user.id)
 
@@ -120,21 +118,14 @@ function Profile() {
                 setError(error.message)
             } else {
                 setProfile(data)
+                setFutureIds(data.future_events || [])
+                setHistoryIds(data.event_history || [])
 
-                // Avatar
                 const { data: avatarData } = supabase.storage
                     .from('avatars')
                     .getPublicUrl(user.id)
                 if (avatarData?.publicUrl) {
                     setAvatarUrl(avatarData.publicUrl + '?t=' + Date.now())
-                }
-
-                // Load registered opportunities from future_events
-                if (data.future_events?.length) {
-                    const regs = opportunities.filter((op) =>
-                        data.future_events.includes(op.id)
-                    )
-                    setRegistered(regs)
                 }
             }
 
@@ -144,7 +135,59 @@ function Profile() {
         fetchProfile()
     }, [])
 
-    // ── Avatar upload ────────────────────────────────────────────
+    // Derived opportunity objects
+    const futureEvents = useMemo(() =>
+        opportunities.filter((op) => futureIds.includes(op.id)),
+        [futureIds]
+    )
+
+    const historyEvents = useMemo(() =>
+        opportunities.filter((op) => historyIds.includes(op.id)),
+        [historyIds]
+    )
+
+    // ── Mark event as completed ───────────────────────────────
+    const handleMarkComplete = async (opId) => {
+        if (!userId) return
+        const newFutureIds = futureIds.filter((id) => id !== opId)
+        const newHistoryIds = historyIds.includes(opId) ? historyIds : [...historyIds, opId]
+
+        setFutureIds(newFutureIds)
+        setHistoryIds(newHistoryIds)
+
+        await supabase
+            .from('profiles')
+            .update({ future_events: newFutureIds, event_history: newHistoryIds })
+            .eq('id', userId)
+    }
+
+    // ── Undo completion ───────────────────────────────────────
+    const handleUndoComplete = async (opId) => {
+        if (!userId) return
+        const newHistoryIds = historyIds.filter((id) => id !== opId)
+        const newFutureIds = futureIds.includes(opId) ? futureIds : [...futureIds, opId]
+
+        setHistoryIds(newHistoryIds)
+        setFutureIds(newFutureIds)
+
+        await supabase
+            .from('profiles')
+            .update({ future_events: newFutureIds, event_history: newHistoryIds })
+            .eq('id', userId)
+    }
+
+    // ── Cancel registration ───────────────────────────────────
+    const handleUncommit = async (opId) => {
+        if (!userId) return
+        const newFutureIds = futureIds.filter((id) => id !== opId)
+        setFutureIds(newFutureIds)
+        await supabase
+            .from('profiles')
+            .update({ future_events: newFutureIds })
+            .eq('id', userId)
+    }
+
+    // ── Avatar upload ─────────────────────────────────────────
     const handleAvatarChange = async (e) => {
         const file = e.target.files?.[0]
         if (!file) return
@@ -163,12 +206,12 @@ function Profile() {
         setAvatarUploading(false)
     }
 
-    // ── Field change ─────────────────────────────────────────────
+    // ── Field change ──────────────────────────────────────────
     const handleChange = (field, value) => {
         setProfile((prev) => ({ ...prev, [field]: value }))
     }
 
-    // ── Age validation ───────────────────────────────────────────
+    // ── Age validation ────────────────────────────────────────
     const handleAgeChange = (e) => {
         const val = parseInt(e.target.value)
         if (isNaN(val)) { handleChange('age', ''); return }
@@ -176,47 +219,37 @@ function Profile() {
         handleChange('age', val)
     }
 
-    // ── Skill bubbles ────────────────────────────────────────────
+    // ── Skill bubbles ─────────────────────────────────────────
     const handleSkillKeyDown = (e) => {
         if (e.key === 'Enter') {
             e.preventDefault()
             const trimmed = skillInput.trim()
             if (!trimmed) return
             const current = profile?.skill_set || []
-            if (!current.includes(trimmed)) {
-                handleChange('skill_set', [...current, trimmed])
-            }
+            if (!current.includes(trimmed)) handleChange('skill_set', [...current, trimmed])
             setSkillInput('')
         }
     }
-
-    const removeSkill = (skill) => {
+    const removeSkill = (skill) =>
         handleChange('skill_set', (profile?.skill_set || []).filter((s) => s !== skill))
-    }
 
-    // ── Accessibility bubbles ────────────────────────────────────
+    // ── Accessibility bubbles ─────────────────────────────────
     const handleAccessibilityKeyDown = (e) => {
         if (e.key === 'Enter') {
             e.preventDefault()
             const trimmed = accessibilityInput.trim()
             if (!trimmed) return
             const current = profile?.accessibility_needs || []
-            if (!current.includes(trimmed)) {
-                handleChange('accessibility_needs', [...current, trimmed])
-            }
+            if (!current.includes(trimmed)) handleChange('accessibility_needs', [...current, trimmed])
             setAccessibilityInput('')
         }
     }
-
-    const removeAccessibility = (item) => {
+    const removeAccessibility = (item) =>
         handleChange('accessibility_needs', (profile?.accessibility_needs || []).filter((s) => s !== item))
-    }
 
-    // ── Geolocation ──────────────────────────────────────────────
+    // ── Geolocation ───────────────────────────────────────────
     const handleLocationFocus = () => {
-        if (!navigator.geolocation) return
-        if (profile?.location) return
-
+        if (!navigator.geolocation || profile?.location) return
         navigator.geolocation.getCurrentPosition(
             async (pos) => {
                 const { latitude, longitude } = pos.coords
@@ -225,30 +258,23 @@ function Profile() {
                         `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
                     )
                     const json = await res.json()
-                    const city =
-                        json.address?.city ||
-                        json.address?.town ||
-                        json.address?.village ||
-                        json.address?.county || ''
+                    const city = json.address?.city || json.address?.town || json.address?.village || json.address?.county || ''
                     const country = json.address?.country || ''
                     const locationString = [city, country].filter(Boolean).join(', ')
                     if (locationString) handleChange('location', locationString)
-                } catch {
-                    // silently fail
-                }
+                } catch { /* silently fail */ }
             },
             () => { /* permission denied */ }
         )
     }
 
-    // ── Save ─────────────────────────────────────────────────────
+    // ── Save ──────────────────────────────────────────────────
     const handleSave = async () => {
         setSaving(true)
         setError('')
         setSuccess('')
 
         const { data: { user } } = await supabase.auth.getUser()
-
         const { error } = await supabase
             .from('profiles')
             .update({
@@ -266,54 +292,31 @@ function Profile() {
             .eq('id', user.id)
 
         setSaving(false)
-
-        if (error) {
-            setError(error.message)
-        } else {
-            setSuccess('Saved successfully.')
-            setEditing(false)
-        }
+        if (error) { setError(error.message) }
+        else { setSuccess('Saved successfully.'); setEditing(false) }
     }
 
-    // ── Uncommit from opportunity ─────────────────────────────────
-    const handleUncommit = async (opId) => {
-        if (!userId) return
-        const updatedRegistered = registered.filter((op) => op.id !== opId)
-        const updatedIds = updatedRegistered.map((op) => op.id)
-
-        // Optimistically update UI
-        setRegistered(updatedRegistered)
-
-        // Persist to Supabase
-        await supabase
-            .from('profiles')
-            .update({ future_events: updatedIds })
-            .eq('id', userId)
-    }
-
-    // ── Stats ────────────────────────────────────────────────────
-    const totalJoined = registered.length
+    // ── Stats — driven by event_history only ──────────────────
+    const totalCompleted = historyEvents.length
 
     const totalHours = useMemo(() => {
-        return registered.reduce((sum, op) => {
+        return historyEvents.reduce((sum, op) => {
             const durationText = op.timeCommitment || getTimeCommitment(op.timeRange)
             if (!durationText) return sum
             const hrMatch = durationText.match(/(\d+)\s*hr/)
             const minMatch = durationText.match(/(\d+)\s*min/)
-            const hours = hrMatch ? Number(hrMatch[1]) : 0
-            const mins = minMatch ? Number(minMatch[1]) : 0
-            return sum + hours + mins / 60
+            return sum + (hrMatch ? Number(hrMatch[1]) : 0) + (minMatch ? Number(minMatch[1]) / 60 : 0)
         }, 0)
-    }, [registered])
+    }, [historyEvents])
 
     const manageableSummary = useMemo(() => {
         let easyStart = 0, beginner = 0, solo = 0, quiet = 0
-        registered.forEach((op) => {
+        historyEvents.forEach((op) => {
             if (op.effortLevel === 1) easyStart += 1
             if (op.beginnerFriendly) beginner += 1
-            const lowerTags = (op.tags || []).map((t) => t.toLowerCase())
-            if (lowerTags.some((t) => t.includes('alone') || t.includes('solo'))) solo += 1
-            if (lowerTags.some((t) => t.includes('quiet') || t.includes('small group'))) quiet += 1
+            const lt = (op.tags || []).map((t) => t.toLowerCase())
+            if (lt.some((t) => t.includes('alone') || t.includes('solo'))) solo += 1
+            if (lt.some((t) => t.includes('quiet') || t.includes('small group'))) quiet += 1
         })
         const items = []
         if (easyStart > 0) items.push('Easy-start opportunities')
@@ -321,54 +324,46 @@ function Profile() {
         if (solo > 0) items.push('Options where you can come on your own')
         if (quiet > 0) items.push('Quieter, lower-pressure settings')
         return items
-    }, [registered])
+    }, [historyEvents])
 
     const reflectionThemes = useMemo(() => {
         const themes = new Set()
-        registered.forEach((op) => {
+        historyEvents.forEach((op) => {
             if (op.effortLevel === 1) themes.add('Starting with small steps')
             if (op.location) themes.add('Getting more comfortable going places')
-            if ((op.tags || []).some((t) => {
-                const l = t.toLowerCase()
-                return l.includes('alone') || l.includes('solo')
-            })) themes.add('Showing up more independently')
-            if ((op.tags || []).some((t) => {
-                const l = t.toLowerCase()
-                return l.includes('quiet') || l.includes('small group')
-            })) themes.add('Finding lower-pressure spaces')
+            if ((op.tags || []).some((t) => { const l = t.toLowerCase(); return l.includes('alone') || l.includes('solo') }))
+                themes.add('Showing up more independently')
+            if ((op.tags || []).some((t) => { const l = t.toLowerCase(); return l.includes('quiet') || l.includes('small group') }))
+                themes.add('Finding lower-pressure spaces')
             if (op.schedule) themes.add('Trying out structure and routine')
             if ((op.skills || []).length > 0) themes.add('Trying new kinds of tasks')
         })
         return Array.from(themes)
-    }, [registered])
-
-    const upcomingRegistered = useMemo(() => {
-        const now = new Date()
-        return registered.filter((op) => !op.date || new Date(op.date) >= now)
-    }, [registered])
-
-    const pastRegistered = useMemo(() => {
-        const now = new Date()
-        return registered.filter((op) => op.date && new Date(op.date) < now)
-    }, [registered])
+    }, [historyEvents])
 
     const weeklyGoal = 3
-    const weeklyCount = Math.min(totalJoined, weeklyGoal)
+    const weeklyCount = Math.min(totalCompleted, weeklyGoal)
     const weeklyPercent = (weeklyCount / weeklyGoal) * 100
 
     const encouragement =
-        totalJoined === 0
+        totalCompleted === 0
             ? 'A small first step can still matter. This space is here to help you ease into what feels manageable.'
-            : totalJoined < 3
+            : totalCompleted < 3
                 ? "You've already started building momentum. Small steps can make leaving feel more familiar over time."
-                : "You've been building real consistency. Keep choosing what feels doable and supportive.";
+                : "You've been building real consistency. Keep choosing what feels doable and supportive."
+
+    // All events to show in "My Events" — future first, then completed (greyscale)
+    const allMyEvents = useMemo(() => [
+        ...futureEvents.map((op) => ({ ...op, _completed: false })),
+        ...historyEvents.map((op) => ({ ...op, _completed: true })),
+    ], [futureEvents, historyEvents])
 
     if (loading) {
         return (
             <div className="profile-page profile-loading">
                 <Spinner animation="border" />
             </div>
-        );
+        )
     }
 
     return (
@@ -400,32 +395,17 @@ function Profile() {
                                             onClick={() => fileInputRef.current?.click()}
                                             disabled={avatarUploading}
                                             style={{
-                                                position: 'absolute',
-                                                bottom: 2,
-                                                right: 2,
-                                                background: '#4d3b43',
-                                                border: 'none',
-                                                borderRadius: '50%',
-                                                width: 28,
-                                                height: 28,
-                                                color: '#fff',
-                                                fontSize: '0.8rem',
-                                                cursor: 'pointer',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
+                                                position: 'absolute', bottom: 2, right: 2,
+                                                background: '#4d3b43', border: 'none', borderRadius: '50%',
+                                                width: 28, height: 28, color: '#fff', fontSize: '0.8rem',
+                                                cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
                                             }}
                                             title="Change photo"
                                         >
                                             {avatarUploading ? '…' : '✎'}
                                         </button>
-                                        <input
-                                            ref={fileInputRef}
-                                            type="file"
-                                            accept="image/*"
-                                            style={{ display: 'none' }}
-                                            onChange={handleAvatarChange}
-                                        />
+                                        <input ref={fileInputRef} type="file" accept="image/*"
+                                            style={{ display: 'none' }} onChange={handleAvatarChange} />
                                     </>
                                 )}
                             </div>
@@ -438,63 +418,45 @@ function Profile() {
                             <p className="journey-email">{profile?.email || '—'}</p>
                         </div>
 
-                        <Button
-                            className="journey-btn-primary"
-                            onClick={() => {
-                                if (!editing) {
-                                    // Snapshot current profile before any edits
+                        {/* "Edit details" only shown when NOT editing — no Close editor button */}
+                        {!editing && (
+                            <Button
+                                className="journey-btn-primary"
+                                onClick={() => {
                                     savedProfileRef.current = { ...profile }
-                                }
-                                setEditing((prev) => !prev)
-                            }}
-                        >
-                            {editing ? 'Close editor' : 'Edit details'}
-                        </Button>
+                                    setEditing(true)
+                                }}
+                            >
+                                Edit details
+                            </Button>
+                        )}
                     </div>
 
                     {!editing ? (
                         <>
                             <div className="journey-meta-row">
-                                {profile?.pronouns && (
-                                    <span className="journey-meta-pill">{profile.pronouns}</span>
-                                )}
-                                {profile?.gender_identity && (
-                                    <span className="journey-meta-pill">{profile.gender_identity}</span>
-                                )}
-                                {profile?.location && (
-                                    <span className="journey-meta-pill">{profile.location}</span>
-                                )}
-                                {profile?.age && (
-                                    <span className="journey-meta-pill">Age {profile.age}</span>
-                                )}
-                                {profile?.has_children && (
-                                    <span className="journey-meta-pill">Has children</span>
-                                )}
-                                {profile?.has_pets && (
-                                    <span className="journey-meta-pill">Has pets</span>
-                                )}
+                                {profile?.pronouns && <span className="journey-meta-pill">{profile.pronouns}</span>}
+                                {profile?.gender_identity && <span className="journey-meta-pill">{profile.gender_identity}</span>}
+                                {profile?.location && <span className="journey-meta-pill">{profile.location}</span>}
+                                {profile?.age && <span className="journey-meta-pill">Age {profile.age}</span>}
+                                {profile?.has_children && <span className="journey-meta-pill">Has children</span>}
+                                {profile?.has_pets && <span className="journey-meta-pill">Has pets</span>}
                             </div>
 
-                            {/* Skill bubbles in view mode */}
                             {profile?.skill_set?.length > 0 && (
                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '0.75rem' }}>
                                     {profile.skill_set.map((s) => <Bubble key={s} label={s} />)}
                                 </div>
                             )}
 
-                            {/* Accessibility needs in view mode */}
                             {profile?.accessibility_needs?.length > 0 && (
                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '0.5rem' }}>
-                                    {profile.accessibility_needs.map((s) => (
-                                        <Bubble key={s} label={`♿ ${s}`} />
-                                    ))}
+                                    {profile.accessibility_needs.map((s) => <Bubble key={s} label={`♿ ${s}`} />)}
                                 </div>
                             )}
 
                             <div className="journey-encouragement-card">
-                                <div className="journey-encouragement-icon">
-                                    <Stars />
-                                </div>
+                                <div className="journey-encouragement-icon"><Stars /></div>
                                 <div>
                                     <p className="journey-encouragement-title">Small steps still count</p>
                                     <p className="journey-encouragement-text">{encouragement}</p>
@@ -507,52 +469,31 @@ function Profile() {
                                 <Col md={6}>
                                     <Form.Group>
                                         <Form.Label>Name</Form.Label>
-                                        <Form.Control
-                                            value={profile?.name || ''}
-                                            onChange={(e) => handleChange('name', e.target.value)}
-                                        />
+                                        <Form.Control value={profile?.name || ''} onChange={(e) => handleChange('name', e.target.value)} />
                                     </Form.Group>
                                 </Col>
-
                                 <Col md={6}>
                                     <Form.Group>
                                         <Form.Label>Age</Form.Label>
-                                        <Form.Control
-                                            type="number"
-                                            min={0}
-                                            max={100}
-                                            value={profile?.age || ''}
-                                            onChange={handleAgeChange}
-                                        />
+                                        <Form.Control type="number" min={0} max={100} value={profile?.age || ''} onChange={handleAgeChange} />
                                         <Form.Text className="text-muted">0–100 only.</Form.Text>
                                     </Form.Group>
                                 </Col>
-
                                 <Col md={6}>
                                     <Form.Group>
                                         <Form.Label>Pronouns</Form.Label>
-                                        <Form.Control
-                                            value={profile?.pronouns || ''}
-                                            onChange={(e) => handleChange('pronouns', e.target.value)}
-                                        />
+                                        <Form.Control value={profile?.pronouns || ''} onChange={(e) => handleChange('pronouns', e.target.value)} />
                                     </Form.Group>
                                 </Col>
-
                                 <Col md={6}>
                                     <Form.Group>
                                         <Form.Label>Gender Identity</Form.Label>
-                                        <Form.Select
-                                            value={profile?.gender_identity || ''}
-                                            onChange={(e) => handleChange('gender_identity', e.target.value)}
-                                        >
+                                        <Form.Select value={profile?.gender_identity || ''} onChange={(e) => handleChange('gender_identity', e.target.value)}>
                                             <option value="">Select…</option>
-                                            {GENDER_OPTIONS.map((g) => (
-                                                <option key={g} value={g}>{g}</option>
-                                            ))}
+                                            {GENDER_OPTIONS.map((g) => <option key={g} value={g}>{g}</option>)}
                                         </Form.Select>
                                     </Form.Group>
                                 </Col>
-
                                 <Col md={12}>
                                     <Form.Group>
                                         <Form.Label>Location</Form.Label>
@@ -562,83 +503,46 @@ function Profile() {
                                             onChange={(e) => handleChange('location', e.target.value)}
                                             placeholder="Click to use your location, or type manually"
                                         />
-                                        <Form.Text className="text-muted">
-                                            Clicking the field will ask to use your device location.
-                                        </Form.Text>
+                                        <Form.Text className="text-muted">Clicking the field will ask to use your device location.</Form.Text>
                                     </Form.Group>
                                 </Col>
-
                                 <Col md={6}>
                                     <Form.Group>
                                         <Form.Label>Skills / Interests</Form.Label>
                                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '8px' }}>
-                                            {(profile?.skill_set || []).map((s) => (
-                                                <Bubble key={s} label={s} onRemove={() => removeSkill(s)} />
-                                            ))}
+                                            {(profile?.skill_set || []).map((s) => <Bubble key={s} label={s} onRemove={() => removeSkill(s)} />)}
                                         </div>
-                                        <Form.Control
-                                            value={skillInput}
-                                            onChange={(e) => setSkillInput(e.target.value)}
-                                            onKeyDown={handleSkillKeyDown}
-                                            placeholder="Type a skill and press Enter"
-                                        />
+                                        <Form.Control value={skillInput} onChange={(e) => setSkillInput(e.target.value)} onKeyDown={handleSkillKeyDown} placeholder="Type a skill and press Enter" />
                                         <Form.Text className="text-muted">Press Enter to add each skill.</Form.Text>
                                     </Form.Group>
                                 </Col>
-
                                 <Col md={6}>
                                     <Form.Group>
                                         <Form.Label>Accessibility Needs</Form.Label>
                                         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '8px' }}>
-                                            {(profile?.accessibility_needs || []).map((s) => (
-                                                <Bubble key={s} label={s} onRemove={() => removeAccessibility(s)} />
-                                            ))}
+                                            {(profile?.accessibility_needs || []).map((s) => <Bubble key={s} label={s} onRemove={() => removeAccessibility(s)} />)}
                                         </div>
-                                        <Form.Control
-                                            value={accessibilityInput}
-                                            onChange={(e) => setAccessibilityInput(e.target.value)}
-                                            onKeyDown={handleAccessibilityKeyDown}
-                                            placeholder="Type a need and press Enter"
-                                        />
+                                        <Form.Control value={accessibilityInput} onChange={(e) => setAccessibilityInput(e.target.value)} onKeyDown={handleAccessibilityKeyDown} placeholder="Type a need and press Enter" />
                                         <Form.Text className="text-muted">Press Enter to add each item.</Form.Text>
                                     </Form.Group>
                                 </Col>
-
                                 <Col md={6}>
-                                    <Form.Check
-                                        type="checkbox"
-                                        label="I have children"
-                                        checked={profile?.has_children || false}
-                                        onChange={(e) => handleChange('has_children', e.target.checked)}
-                                    />
+                                    <Form.Check type="checkbox" label="I have children" checked={profile?.has_children || false} onChange={(e) => handleChange('has_children', e.target.checked)} />
                                 </Col>
-
                                 <Col md={6}>
-                                    <Form.Check
-                                        type="checkbox"
-                                        label="I have pets"
-                                        checked={profile?.has_pets || false}
-                                        onChange={(e) => handleChange('has_pets', e.target.checked)}
-                                    />
+                                    <Form.Check type="checkbox" label="I have pets" checked={profile?.has_pets || false} onChange={(e) => handleChange('has_pets', e.target.checked)} />
                                 </Col>
                             </Row>
 
                             <div className="journey-edit-actions">
-                                <Button
-                                    className="journey-btn-primary"
-                                    onClick={handleSave}
-                                    disabled={saving}
-                                >
+                                <Button className="journey-btn-primary" onClick={handleSave} disabled={saving}>
                                     {saving ? 'Saving…' : 'Save changes'}
                                 </Button>
-
+                                {/* Cancel reverts changes and closes the form */}
                                 <Button
                                     className="journey-btn-secondary"
                                     onClick={() => {
-                                        // Revert any unsaved changes
-                                        if (savedProfileRef.current) {
-                                            setProfile(savedProfileRef.current)
-                                        }
+                                        if (savedProfileRef.current) setProfile(savedProfileRef.current)
                                         setEditing(false)
                                         setSkillInput('')
                                         setAccessibilityInput('')
@@ -656,35 +560,32 @@ function Profile() {
                     {success && <p className="journey-message journey-success">{success}</p>}
                 </Card>
 
-                {/* ── Summary Cards ── */}
+                {/* ── Summary Cards — driven by event_history only ── */}
                 <Row className="g-4 mt-1 mb-4">
                     <Col md={6} xl={3} className="d-flex">
                         <Card className="journey-summary-card">
                             <div className="journey-summary-icon"><Heart /></div>
-                            <p className="journey-summary-label">You've said yes to</p>
-                            <h3 className="journey-summary-value">{totalJoined}</h3>
-                            <p className="journey-summary-subtext">opportunities so far</p>
+                            <p className="journey-summary-label">Events completed</p>
+                            <h3 className="journey-summary-value">{totalCompleted}</h3>
+                            <p className="journey-summary-subtext">opportunities finished so far</p>
                         </Card>
                     </Col>
-
                     <Col md={6} xl={3} className="d-flex">
                         <Card className="journey-summary-card">
                             <div className="journey-summary-icon"><Clock /></div>
-                            <p className="journey-summary-label">Time you've made for yourself</p>
+                            <p className="journey-summary-label">Time you've given</p>
                             <h3 className="journey-summary-value">{totalHours.toFixed(1)}</h3>
-                            <p className="journey-summary-subtext">hours set aside</p>
+                            <p className="journey-summary-subtext">hours completed</p>
                         </Card>
                     </Col>
-
                     <Col md={6} xl={3} className="d-flex">
                         <Card className="journey-summary-card">
                             <div className="journey-summary-icon"><PersonHeart /></div>
                             <p className="journey-summary-label">This week's momentum</p>
                             <h3 className="journey-summary-value">{weeklyCount}/{weeklyGoal}</h3>
-                            <p className="journey-summary-subtext">small steps toward your goal</p>
+                            <p className="journey-summary-subtext">completed toward your goal</p>
                         </Card>
                     </Col>
-
                     <Col md={6} xl={3} className="d-flex">
                         <Card className="journey-summary-card">
                             <div className="journey-summary-icon"><Stars /></div>
@@ -708,36 +609,42 @@ function Profile() {
                                 : "You reached this week's goal"}
                         </Badge>
                     </div>
-
                     <p className="journey-progress-copy">
                         Even one small, manageable opportunity can help build more comfort, routine, and independence over time.
                     </p>
-
                     <ProgressBar now={weeklyPercent} className="journey-progress-bar" />
                 </Card>
 
-                {/* ── Upcoming + Themes ── */}
+                {/* ── My Events + Themes ── */}
                 <Row className="g-4 mb-4">
                     <Col lg={7}>
                         <Card className="journey-section-card h-100">
                             <div className="journey-section-header">
                                 <div>
-                                    <p className="journey-section-kicker">COMING UP</p>
-                                    <h3 className="journey-section-title">Upcoming opportunities</h3>
+                                    <p className="journey-section-kicker">YOUR EVENTS</p>
+                                    <h3 className="journey-section-title">My Events</h3>
                                 </div>
                             </div>
 
-                            {upcomingRegistered.length === 0 ? (
+                            {allMyEvents.length === 0 ? (
                                 <div className="journey-empty-state">
-                                    <p className="journey-empty-title">Nothing upcoming yet</p>
+                                    <p className="journey-empty-title">No events yet</p>
                                     <p className="journey-empty-text">
                                         When you say "I'm in" to an opportunity, it'll show up here.
                                     </p>
                                 </div>
                             ) : (
                                 <div className="journey-opportunity-list">
-                                    {upcomingRegistered.map((op) => (
-                                        <div key={op.id} className="journey-opportunity-item">
+                                    {allMyEvents.map((op) => (
+                                        <div
+                                            key={op.id}
+                                            className="journey-opportunity-item"
+                                            style={{
+                                                filter: op._completed ? 'grayscale(1)' : 'none',
+                                                opacity: op._completed ? 0.65 : 1,
+                                                transition: 'filter 0.2s ease, opacity 0.2s ease',
+                                            }}
+                                        >
                                             <div className="journey-opportunity-main">
                                                 <p className="journey-opportunity-org">{op.organization}</p>
                                                 <h4 className="journey-opportunity-title">{op.title}</h4>
@@ -759,16 +666,48 @@ function Profile() {
                                                     )}
                                                 </div>
                                             </div>
-                                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.5rem' }}>
-                                                <Badge className="journey-opportunity-badge">
-                                                    {op.effortLevel === 1 ? 'Easy start' : op.effortLevel === 2 ? 'Small stretch' : 'Ready for more'}
+
+                                            {/* Right column — badge on top, then cancel, then checkbox */}
+                                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '0.5rem', flexShrink: 0 }}>
+                                                <Badge className={`journey-opportunity-badge ${op._completed ? 'journey-opportunity-badge--past' : ''}`}>
+                                                    {op._completed ? 'Completed' : (op.effortLevel === 1 ? 'Easy start' : op.effortLevel === 2 ? 'Small stretch' : 'Ready for more')}
                                                 </Badge>
-                                                <button
-                                                    className="journey-uncommit-btn"
-                                                    onClick={() => handleUncommit(op.id)}
+
+                                                {/* Cancel registration — only for non-completed */}
+                                                {!op._completed && (
+                                                    <button
+                                                        className="journey-uncommit-btn"
+                                                        onClick={() => handleUncommit(op.id)}
+                                                    >
+                                                        Cancel registration
+                                                    </button>
+                                                )}
+
+                                                {/* Mark as done checkbox — below cancel, left-aligned with it */}
+                                                <label
+                                                    style={{
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        gap: '6px',
+                                                        fontSize: '0.82rem',
+                                                        fontWeight: 600,
+                                                        color: op._completed ? '#8a6e79' : '#5d4a52',
+                                                        cursor: 'pointer',
+                                                        userSelect: 'none',
+                                                    }}
                                                 >
-                                                    Cancel registration
-                                                </button>
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={op._completed}
+                                                        onChange={() =>
+                                                            op._completed
+                                                                ? handleUndoComplete(op.id)
+                                                                : handleMarkComplete(op.id)
+                                                        }
+                                                        style={{ accentColor: '#c97f97', width: 16, height: 16, cursor: 'pointer' }}
+                                                    />
+                                                    {op._completed ? 'Mark as not done' : 'Mark as done'}
+                                                </label>
                                             </div>
                                         </div>
                                     ))}
@@ -790,7 +729,7 @@ function Profile() {
                                 <div className="journey-empty-state">
                                     <p className="journey-empty-title">Nothing here yet</p>
                                     <p className="journey-empty-text">
-                                        As you join opportunities, this section will reflect the kinds of steps you've been taking.
+                                        As you complete opportunities, this section will reflect the kinds of steps you've been taking.
                                     </p>
                                 </div>
                             ) : (
@@ -817,56 +756,6 @@ function Profile() {
                         </Card>
                     </Col>
                 </Row>
-
-                {/* ── Past ── */}
-                <Card className="journey-section-card">
-                    <div className="journey-section-header">
-                        <div>
-                            <p className="journey-section-kicker">SO FAR</p>
-                            <h3 className="journey-section-title">What you've been part of so far</h3>
-                        </div>
-                    </div>
-
-                    {pastRegistered.length === 0 ? (
-                        <div className="journey-empty-state">
-                            <p className="journey-empty-title">No past opportunities yet</p>
-                            <p className="journey-empty-text">
-                                Past opportunities will show up here once their date has passed.
-                            </p>
-                        </div>
-                    ) : (
-                        <div className="journey-opportunity-list">
-                            {pastRegistered.map((op) => (
-                                <div key={op.id} className="journey-opportunity-item journey-opportunity-item--past">
-                                    <div className="journey-opportunity-main">
-                                        <p className="journey-opportunity-org">{op.organization}</p>
-                                        <h4 className="journey-opportunity-title">{op.title}</h4>
-                                        <div className="journey-opportunity-meta">
-                                            {op.schedule && (
-                                                <span className="journey-opportunity-pill">
-                                                    <CalendarEvent size={14} />{op.schedule}
-                                                </span>
-                                            )}
-                                            {op.timeRange && (
-                                                <span className="journey-opportunity-pill">
-                                                    <Clock size={14} />{op.timeRange}
-                                                </span>
-                                            )}
-                                            {op.location && (
-                                                <span className="journey-opportunity-pill">
-                                                    <GeoAlt size={14} />{op.location}
-                                                </span>
-                                            )}
-                                        </div>
-                                    </div>
-                                    <Badge className="journey-opportunity-badge journey-opportunity-badge--past">
-                                        Completed
-                                    </Badge>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </Card>
 
             </Container>
         </div>

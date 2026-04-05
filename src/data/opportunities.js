@@ -42,6 +42,7 @@ const opportunities = [
         description:
             "Water plants, sort herbs, and help tidy the garden beds with a friendly team outdoors.",
         location: "Mount Pleasant",
+        past: true,
         effortLevel: 2,
         schedule: "Saturday mornings",
         timeRange: '10am-2pm',
