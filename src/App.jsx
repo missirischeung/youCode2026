@@ -47,12 +47,19 @@ function App() {
                 setProfile(data)
             }
 
-            // Fetch avatar from storage
+            // Only set avatar if the file actually exists in storage
             const { data: avatarData } = supabase.storage
                 .from('avatars')
                 .getPublicUrl(session.user.id)
             if (avatarData?.publicUrl) {
-                setAvatarUrl(avatarData.publicUrl + '?t=' + Date.now())
+                try {
+                    const res = await fetch(avatarData.publicUrl, { method: 'HEAD' })
+                    if (res.ok) {
+                        setAvatarUrl(avatarData.publicUrl + '?t=' + Date.now())
+                    }
+                } catch {
+                    // no avatar uploaded, leave avatarUrl as null
+                }
             }
         }
         fetchProfile()

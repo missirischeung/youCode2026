@@ -1,26 +1,27 @@
 /* ─── Tokens ─────────────────────────────────────────────── */
 .oc-card {
-    --oc-rose:        #c97f97;
-    --oc-rose-dark:   #a85f79;
-    --oc-rose-soft:   #f7eef2;
-    --oc-blush:       #fffdfd;
-    --oc-cream:       #fff8fa;
-    --oc-border:      #ead7df;
-    --oc-text:        #4d3b43;
-    --oc-muted:       #8a6e79;
+    --oc-rose: #c97f97;
+    --oc-rose-dark: #a85f79;
+    --oc-rose-soft: #f7eef2;
+    --oc-blush: #fffdfd;
+    --oc-cream: #fff8fa;
+    --oc-border: #ead7df;
+    --oc-text: #4d3b43;
+    --oc-muted: #8a6e79;
 
-    --oc-pill-1-bg:   #f5e9ee;
+    --oc-pill-1-bg: #f5e9ee;
     --oc-pill-1-text: #9c5f76;
-    --oc-pill-2-bg:   #f8efe3;
+    --oc-pill-2-bg: #f8efe3;
     --oc-pill-2-text: #9a7450;
-    --oc-pill-3-bg:   #efe8f6;
+    --oc-pill-3-bg: #efe8f6;
     --oc-pill-3-text: #7f6497;
 }
 
 /* ─── Card shell ─────────────────────────────────────────── */
 .oc-card {
     background: var(--oc-blush);
-    border-radius: 0;           /* modal handles rounding */
+    border-radius: 0;
+    /* modal handles rounding */
     display: flex;
     flex-direction: column;
     font-family: 'DM Sans', 'Segoe UI', sans-serif;
@@ -80,12 +81,12 @@
     text-underline-offset: 3px;
     text-decoration-color: rgba(168, 95, 121, 0.35);
     width: fit-content;
-  }
-  
-  .oc-location-link:hover {
+}
+
+.oc-location-link:hover {
     color: var(--oc-rose);
     text-decoration-color: var(--oc-rose);
-  }
+}
 
 .oc-header-badges {
     display: flex;
@@ -132,9 +133,20 @@
     white-space: nowrap;
 }
 
-.effort-level--1 .oc-effort-badge { background: var(--oc-pill-1-bg); color: var(--oc-pill-1-text); }
-.effort-level--2 .oc-effort-badge { background: var(--oc-pill-2-bg); color: var(--oc-pill-2-text); }
-.effort-level--3 .oc-effort-badge { background: var(--oc-pill-3-bg); color: var(--oc-pill-3-text); }
+.effort-level--1 .oc-effort-badge {
+    background: var(--oc-pill-1-bg);
+    color: var(--oc-pill-1-text);
+}
+
+.effort-level--2 .oc-effort-badge {
+    background: var(--oc-pill-2-bg);
+    color: var(--oc-pill-2-text);
+}
+
+.effort-level--3 .oc-effort-badge {
+    background: var(--oc-pill-3-bg);
+    color: var(--oc-pill-3-text);
+}
 
 .oc-time-badge {
     display: inline-flex;
@@ -160,7 +172,9 @@
     flex-shrink: 0;
 }
 
-.oc-pill-nav::-webkit-scrollbar { display: none; }
+.oc-pill-nav::-webkit-scrollbar {
+    display: none;
+}
 
 .oc-pill-btn {
     padding: 7px 16px;
@@ -389,8 +403,15 @@
     flex-shrink: 0;
 }
 
-.oc-good-dot--green { background: #eaf3e6; color: #2d5e26; }
-.oc-good-dot--amber { background: #fdf7ec; color: #7a5c1e; }
+.oc-good-dot--green {
+    background: #eaf3e6;
+    color: #2d5e26;
+}
+
+.oc-good-dot--amber {
+    background: #fdf7ec;
+    color: #7a5c1e;
+}
 
 /* ─── Skills tab ─────────────────────────────────────────── */
 .oc-skills-row {
@@ -450,12 +471,40 @@
     cursor: default;
 }
 
+.oc-commit-btn--committed {
+    background: #fff0f3 !important;
+    color: #b44f68 !important;
+    border: 1.5px solid #f0bcc8 !important;
+}
+
+.oc-commit-btn--committed:hover {
+    background: #fce0e6 !important;
+    color: #9e3550 !important;
+}
+
 /* ─── Responsive ─────────────────────────────────────────── */
 @media (max-width: 600px) {
-    .oc-header   { padding: 16px 18px 12px; }
-    .oc-pill-nav { padding: 0 18px 12px; }
-    .oc-section  { padding: 16px 18px; }
-    .oc-footer   { padding: 14px 18px 18px; }
-    .oc-info-grid { grid-template-columns: 1fr; }
-    .oc-title    { font-size: 1.3rem; }
+    .oc-header {
+        padding: 16px 18px 12px;
+    }
+
+    .oc-pill-nav {
+        padding: 0 18px 12px;
+    }
+
+    .oc-section {
+        padding: 16px 18px;
+    }
+
+    .oc-footer {
+        padding: 14px 18px 18px;
+    }
+
+    .oc-info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .oc-title {
+        font-size: 1.3rem;
+    }
 }

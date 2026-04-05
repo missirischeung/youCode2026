@@ -469,3 +469,22 @@
         justify-content: flex-start;
     }
 }
+
+.journey-uncommit-btn {
+    background: none;
+    border: 1px solid #f0bcc8;
+    border-radius: 8px;
+    color: #b44f68;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 0.3rem 0.65rem;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+    white-space: nowrap;
+}
+
+.journey-uncommit-btn:hover {
+    background: #fce0e6;
+    color: #9e3550;
+    border-color: #e8a0b4;
+}

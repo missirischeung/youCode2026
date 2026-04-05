@@ -1,15 +1,53 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Container, Modal } from 'react-bootstrap'
 import PreviewCard from '../components/PreviewCard'
 import OpportunityCard from '../components/OpportunityCard'
 import opportunities from '../data/opportunities'
+import { supabase } from '../supabaseClient'
 import './Dashboard.css'
 
-function Dashboard({ onCommit, committedIds = [] }) {
+function Dashboard() {
     const [selectedOpportunity, setSelectedOpportunity] = useState(null)
+    const [committedIds, setCommittedIds] = useState([])
+    const [userId, setUserId] = useState(null)
 
-    function handleCommit(details) {
-        onCommit?.(details)
+    // Load the current user + their existing future_events on mount
+    useEffect(() => {
+        const init = async () => {
+            const { data: { user } } = await supabase.auth.getUser()
+            if (!user) return
+            setUserId(user.id)
+
+            const { data } = await supabase
+                .from('profiles')
+                .select('future_events')
+                .eq('id', user.id)
+                .single()
+
+            if (data?.future_events?.length) {
+                setCommittedIds(data.future_events)
+            }
+        }
+        init()
+    }, [])
+
+    const handleCommit = async ({ id }) => {
+        if (!userId) return
+
+        const isAlreadyCommitted = committedIds.includes(id)
+        const updated = isAlreadyCommitted
+            ? committedIds.filter((cid) => cid !== id)
+            : [...committedIds, id]
+
+        // Optimistically update UI
+        setCommittedIds(updated)
+
+        // Persist to Supabase
+        await supabase
+            .from('profiles')
+            .update({ future_events: updated })
+            .eq('id', userId)
+
         setSelectedOpportunity(null)
     }
 
