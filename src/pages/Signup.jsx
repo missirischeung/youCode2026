@@ -81,7 +81,7 @@ function Signup() {
                         <div className="signup-brand-logo">
                             <LogoPlaceholder />
                         </div>
-                        <span className="signup-brand-name">Foursight</span>
+                        <span className="signup-brand-name">ForHer</span>
                     </div>
 
                     {/* Hero copy */}

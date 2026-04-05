@@ -22,7 +22,7 @@ function AppNavbar({ session, profile, avatarUrl, handleLogout, searchQuery, set
                     to="/"
                     style={{ color: '#fff', fontWeight: '700' }}
                 >
-                    Foursight
+                    ForHer
                 </Navbar.Brand>
 
                 <Navbar.Toggle aria-controls="main-navbar" />
