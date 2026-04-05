@@ -1,3 +1,5 @@
+import kitchenImg from "../assets/kitchen.png";
+import gardenImg from "../assets/gardener.png";
 const opportunities = [
     {
         id: 1,
@@ -33,6 +35,7 @@ const opportunities = [
           website: "https://sunrise.example.org",
           contactName: "Maya Chen",
           contactEmail: "maya@sunrise.org",
+          image: kitchenImg,
     },
 
     {
@@ -66,6 +69,7 @@ const opportunities = [
           website: "https://sunrise.example.org",
           contactName: "Maya Chen",
           contactEmail: "maya@sunrise.org",
+          image: gardenImg,
     },
 ];
 

@@ -70,6 +70,7 @@ function OpportunityCard({
     contactName,
     contactEmail,
     onClose,
+    image,
 }) {
     const [activeTab, setActiveTab] = useState("overview");
 
@@ -97,31 +98,51 @@ function OpportunityCard({
             <div className="oc-accent-bar" />
 
             {/* ── Header: always visible ── */}
-            <div className="oc-header">
-            <div className="oc-header-top">
-    <button className="oc-close-btn" onClick={onClose} aria-label="Close">✕</button>
-    {duration && (
-        <span className="oc-time-badge">
-            <Clock size={12} /> Time Commitment: {duration}
-        </span>
+<div
+    className="oc-header"
+    style={{
+        backgroundImage: image ? `url(${image})` : undefined,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        position: "relative",
+    }}
+>
+    {/* Optional overlay for readability */}
+    {image && (
+        <div
+            style={{
+                position: "absolute",
+                inset: 0,
+                backgroundColor: "rgba(255, 255, 255, 0.45)", // tweak opacity as needed
+                zIndex: 1,
+            }}
+        />
     )}
-</div>
 
-    <div className="oc-title-group">
-        <p className="oc-org">{organization}</p>
-        <h3 className="oc-title">{title}</h3>
-
-        {location && mapsUrl && (
-            <a href={mapsUrl} target="_blank" rel="noopener noreferrer" className="oc-location-link">
-                <GeoAlt size={13} />
-                <span>{location}</span>
-            </a>
-        )}
-
-        <div className="oc-quick-tags">
-            {schedule && <span className="oc-quick-tag"><CalendarEvent size={13} /><span>{schedule}</span></span>}
-            {timeRange && <span className="oc-quick-tag"><Clock size={13} /><span>{timeRange}</span></span>}
-            {cost && <span className="oc-quick-tag"><CashCoin size={13} /><span>{cost}</span></span>}
+    <div style={{ position: "relative", zIndex: 2 }}>
+        {/* existing header content */}
+        <div className="oc-header-top">
+            <button className="oc-close-btn" onClick={onClose} aria-label="Close">✕</button>
+            {duration && (
+                <span className="oc-time-badge">
+                    <Clock size={12} /> Time Commitment: {duration}
+                </span>
+            )}
+        </div>
+        <div className="oc-title-group">
+            <p className="oc-org">{organization}</p>
+            <h3 className="oc-title">{title}</h3>
+            {location && mapsUrl && (
+                <a href={mapsUrl} target="_blank" rel="noopener noreferrer" className="oc-location-link">
+                    <GeoAlt size={13} />
+                    <span>{location}</span>
+                </a>
+            )}
+            <div className="oc-quick-tags">
+                {schedule && <span className="oc-quick-tag"><CalendarEvent size={13} /><span>{schedule}</span></span>}
+                {timeRange && <span className="oc-quick-tag"><Clock size={13} /><span>{timeRange}</span></span>}
+                {cost && <span className="oc-quick-tag"><CashCoin size={13} /><span>{cost}</span></span>}
+            </div>
         </div>
     </div>
 </div>
