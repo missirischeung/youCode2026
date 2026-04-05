@@ -488,3 +488,77 @@
     color: #9e3550;
     border-color: #e8a0b4;
 }
+/* ── Effort level pills — inline with meta pills ─────────── */
+.journey-effort-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.42rem 0.72rem;
+    border-radius: 10px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    border: 1px solid transparent;
+}
+
+/* Easy start — matches oc-pill-1 */
+.journey-effort-pill--1 {
+    background: #f5e9ee;
+    color: #9c5f76;
+    border-color: #e8d0da;
+}
+
+/* Small stretch — matches oc-pill-2 */
+.journey-effort-pill--2 {
+    background: #f8efe3;
+    color: #9a7450;
+    border-color: #ead8c4;
+}
+
+/* Ready for more — matches oc-pill-3 */
+.journey-effort-pill--3 {
+    background: #efe8f6;
+    color: #7f6497;
+    border-color: #ddd0ed;
+}
+
+/* Completed */
+.journey-effort-pill--done {
+    background: #f9f1f4;
+    color: #8a6e79;
+    border-color: #ead7df;
+}
+
+/* ── Custom checkbox ─────────────────────────────────────── */
+.journey-check-label {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #5d4a52;
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+}
+
+.journey-check-box {
+    width: 16px;
+    height: 16px;
+    border-radius: 5px;
+    border: 1.5px solid #d9b1c1;
+    background: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.journey-check-box--checked {
+    background: #c97f97;
+    border-color: #c97f97;
+}
+
+.journey-check-label:hover .journey-check-box:not(.journey-check-box--checked) {
+    border-color: #c97f97;
+    background: #fdf0f4;
+}

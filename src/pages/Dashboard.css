@@ -1,56 +1,59 @@
 .dashboard-page {
-    min-height: 100vh;
-    background: #f8f9fa;
-  }
-  
+  min-height: 100vh;
+  background: #f8f9fa;
+}
+
+.dashboard-title {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: #3f4b46;
+  margin-bottom: 0.5rem;
+}
+
+.dashboard-subtitle {
+  color: #5f6b7a;
+  font-size: 1.05rem;
+  margin-bottom: 2rem;
+  max-width: 700px;
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* 🔥 THIS is the important part */
+.opportunity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.opportunity-modal {
+  max-width: 1100px !important;
+}
+
+.opportunity-modal .modal-content {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  border-radius: 24px;
+  overflow: hidden;
+}
+
+.opportunity-modal-body {
+  padding: 0 !important;
+}
+
+/* Optional: slightly tighter spacing on smaller screens */
+@media (max-width: 768px) {
   .dashboard-title {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #3f4b46;
-    margin-bottom: 0.5rem;
+    font-size: 1.85rem;
   }
-  
+
   .dashboard-subtitle {
-    color: #5f6b7a;
-    font-size: 1.05rem;
-    margin-bottom: 2rem;
-    max-width: 700px;
+    font-size: 0.95rem;
   }
-  
-  /* 🔥 THIS is the important part */
+
   .opportunity-list {
-    display: flex;
-    flex-direction: column;  /* stack vertically */
-    gap: 16px;              /* space between cards */
+    gap: 12px;
   }
-
-  .opportunity-modal {
-    max-width: 1100px !important;
-  }
-  
-  .opportunity-modal .modal-content {
-    background: transparent;
-    border: none;
-    box-shadow: none;
-    border-radius: 24px;
-    overflow: hidden;
-  }
-  
-  .opportunity-modal-body {
-    padding: 0 !important;
-  }
-
-  /* Optional: slightly tighter spacing on smaller screens */
-  @media (max-width: 768px) {
-    .dashboard-title {
-      font-size: 1.6rem;
-    }
-  
-    .dashboard-subtitle {
-      font-size: 0.95rem;
-    }
-  
-    .opportunity-list {
-      gap: 12px;
-    }
-  }
+}

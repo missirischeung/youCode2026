@@ -700,6 +700,17 @@ function Profile() {
                                                     <p className="journey-opportunity-org">{op.organization}</p>
                                                     <h4 className="journey-opportunity-title">{op.title}</h4>
                                                     <div className="journey-opportunity-meta">
+                                                        {/* Effort badge — inline with the other pills */}
+                                                        {!op._completed && (
+                                                            <span className={`journey-effort-pill journey-effort-pill--${op.effortLevel || 1}`}>
+                                                                {op.effortLevel === 1 ? 'Easy start' : op.effortLevel === 2 ? 'Small stretch' : 'Ready for more'}
+                                                            </span>
+                                                        )}
+                                                        {op._completed && (
+                                                            <span className="journey-effort-pill journey-effort-pill--done">
+                                                                Completed
+                                                            </span>
+                                                        )}
                                                         {op.schedule && (
                                                             <span className="journey-opportunity-pill">
                                                                 <CalendarEvent size={14} />{op.schedule}
@@ -718,12 +729,8 @@ function Profile() {
                                                     </div>
                                                 </div>
 
-                                                {/* Right column — badge on top, then cancel, then checkbox */}
+                                                {/* Right column — cancel + checkbox only */}
                                                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '0.5rem', flexShrink: 0 }}>
-                                                    <Badge className={`journey-opportunity-badge ${op._completed ? 'journey-opportunity-badge--past' : ''}`}>
-                                                        {op._completed ? 'Completed' : (op.effortLevel === 1 ? 'Easy start' : op.effortLevel === 2 ? 'Small stretch' : 'Ready for more')}
-                                                    </Badge>
-
                                                     {/* Cancel registration — only for non-completed */}
                                                     {!op._completed && (
                                                         <button
@@ -734,20 +741,18 @@ function Profile() {
                                                         </button>
                                                     )}
 
-                                                    {/* Mark as done checkbox — below cancel, left-aligned with it */}
+                                                    {/* Custom styled checkbox */}
                                                     <label
+                                                        className="journey-check-label"
                                                         onClick={(e) => e.stopPropagation()}
-                                                        style={{
-                                                            display: 'flex',
-                                                            alignItems: 'center',
-                                                            gap: '6px',
-                                                            fontSize: '0.82rem',
-                                                            fontWeight: 600,
-                                                            color: op._completed ? '#8a6e79' : '#5d4a52',
-                                                            cursor: 'pointer',
-                                                            userSelect: 'none',
-                                                        }}
                                                     >
+                                                        <span className={`journey-check-box${op._completed ? ' journey-check-box--checked' : ''}`}>
+                                                            {op._completed && (
+                                                                <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+                                                                    <path d="M1 4L3.8 7L9 1" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                                                                </svg>
+                                                            )}
+                                                        </span>
                                                         <input
                                                             type="checkbox"
                                                             checked={op._completed}
@@ -756,7 +761,7 @@ function Profile() {
                                                                     ? handleUndoComplete(op.id)
                                                                     : handleMarkComplete(op.id)
                                                             }
-                                                            style={{ accentColor: '#c97f97', width: 16, height: 16, cursor: 'pointer' }}
+                                                            style={{ position: 'absolute', opacity: 0, width: 0, height: 0 }}
                                                         />
                                                         {op._completed ? 'Mark as not done' : 'Mark as done'}
                                                     </label>
