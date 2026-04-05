@@ -56,7 +56,7 @@ function App() {
 
     return (
         <>
-            <AppNavbar session={session} profile={profile}/>
+            <AppNavbar session={session} profile={profile} handleLogout={handleLogout}/>
 
             <Routes>
                 <Route path="/" element={<Navigate to="/login" replace />} />
