@@ -105,8 +105,8 @@ function OpportunityCard({
 
     const mapsUrl = location
         ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-              location
-          )}`
+            location
+        )}`
         : null;
 
     return (
@@ -173,9 +173,8 @@ function OpportunityCard({
                 {TABS.map((tab) => (
                     <button
                         key={tab.id}
-                        className={`oc-pill-btn ${
-                            activeTab === tab.id ? "active" : ""
-                        }`}
+                        className={`oc-pill-btn ${activeTab === tab.id ? "active" : ""
+                            }`}
                         onClick={() => setActiveTab(tab.id)}
                     >
                         {tab.label}
@@ -400,13 +399,12 @@ function OpportunityCard({
             <div className="oc-footer">
                 <button
                     type="button"
-                    className="oc-commit-btn"
+                    className={`oc-commit-btn ${isCommitted ? 'oc-commit-btn--committed' : ''}`}
                     onClick={() =>
                         onCommit?.({ id, title, organization, location })
                     }
-                    disabled={isCommitted}
                 >
-                    {isCommitted ? "✓ Committed" : nextStepLabel}
+                    {isCommitted ? "✕ Cancel registration" : nextStepLabel}
                 </button>
             </div>
         </div>

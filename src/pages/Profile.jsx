@@ -85,6 +85,7 @@ function Profile() {
     const [error, setError] = useState('')
     const [success, setSuccess] = useState('')
     const [registered, setRegistered] = useState([])
+    const [userId, setUserId] = useState(null)
 
     // Avatar
     const [avatarUrl, setAvatarUrl] = useState(null)
@@ -106,6 +107,8 @@ function Profile() {
                 setLoading(false)
                 return
             }
+
+            setUserId(user.id)
 
             const { data, error } = await supabase
                 .from('profiles')
@@ -270,6 +273,22 @@ function Profile() {
             setSuccess('Saved successfully.')
             setEditing(false)
         }
+    }
+
+    // ── Uncommit from opportunity ─────────────────────────────────
+    const handleUncommit = async (opId) => {
+        if (!userId) return
+        const updatedRegistered = registered.filter((op) => op.id !== opId)
+        const updatedIds = updatedRegistered.map((op) => op.id)
+
+        // Optimistically update UI
+        setRegistered(updatedRegistered)
+
+        // Persist to Supabase
+        await supabase
+            .from('profiles')
+            .update({ future_events: updatedIds })
+            .eq('id', userId)
     }
 
     // ── Stats ────────────────────────────────────────────────────
@@ -740,9 +759,17 @@ function Profile() {
                                                     )}
                                                 </div>
                                             </div>
-                                            <Badge className="journey-opportunity-badge">
-                                                {op.effortLevel === 1 ? 'Easy start' : op.effortLevel === 2 ? 'Small stretch' : 'Ready for more'}
-                                            </Badge>
+                                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.5rem' }}>
+                                                <Badge className="journey-opportunity-badge">
+                                                    {op.effortLevel === 1 ? 'Easy start' : op.effortLevel === 2 ? 'Small stretch' : 'Ready for more'}
+                                                </Badge>
+                                                <button
+                                                    className="journey-uncommit-btn"
+                                                    onClick={() => handleUncommit(op.id)}
+                                                >
+                                                    Cancel registration
+                                                </button>
+                                            </div>
                                         </div>
                                     ))}
                                 </div>
