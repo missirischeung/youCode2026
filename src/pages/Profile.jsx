@@ -4,6 +4,20 @@ import { supabase } from '../supabaseClient'
 import opportunities from '../data/opportunities'
 import './Profile.css'
 
+const GENDER_OPTIONS = [
+    'Prefer not to say',
+    'Man',
+    'Woman',
+    'Non-binary',
+    'Genderqueer',
+    'Genderfluid',
+    'Agender',
+    'Two-Spirit',
+    'Trans man',
+    'Trans woman',
+    'Other',
+]
+
 function Profile() {
     const [profile, setProfile] = useState(null)
     const [editing, setEditing] = useState(false)
@@ -18,8 +32,9 @@ function Profile() {
     const [avatarUploading, setAvatarUploading] = useState(false)
     const fileInputRef = useRef(null)
 
-    // Skill bubble input
+    // Bubble inputs
     const [skillInput, setSkillInput] = useState('')
+    const [accessibilityInput, setAccessibilityInput] = useState('')
 
     useEffect(() => {
         const fetchProfile = async () => {
@@ -37,12 +52,10 @@ function Profile() {
             } else {
                 setProfile(data)
 
-                // Load avatar from Supabase Storage
                 const { data: avatarData } = supabase.storage
                     .from('avatars')
                     .getPublicUrl(user.id)
                 if (avatarData?.publicUrl) {
-                    // Add cache-busting so updates show immediately
                     setAvatarUrl(avatarData.publicUrl + '?t=' + Date.now())
                 }
 
@@ -59,27 +72,22 @@ function Profile() {
         fetchProfile()
     }, [])
 
-    // ── Avatar upload ──────────────────────────────────────────
+    // ── Avatar ─────────────────────────────────────────────────
     const handleAvatarChange = async (e) => {
         const file = e.target.files?.[0]
         if (!file) return
-
         setAvatarUploading(true)
         setError('')
-
         const { data: { user } } = await supabase.auth.getUser()
-
         const { error: uploadError } = await supabase.storage
             .from('avatars')
             .upload(user.id, file, { upsert: true })
-
         if (uploadError) {
             setError('Failed to upload image: ' + uploadError.message)
         } else {
             const { data } = supabase.storage.from('avatars').getPublicUrl(user.id)
             setAvatarUrl(data.publicUrl + '?t=' + Date.now())
         }
-
         setAvatarUploading(false)
     }
 
@@ -92,8 +100,7 @@ function Profile() {
     const handleAgeChange = (e) => {
         const val = parseInt(e.target.value)
         if (isNaN(val)) { handleChange('age', ''); return }
-        if (val < 0) return
-        if (val > 100) return
+        if (val < 0 || val > 100) return
         handleChange('age', val)
     }
 
@@ -115,10 +122,28 @@ function Profile() {
         handleChange('skill_set', (profile?.skill_set || []).filter((s) => s !== skillToRemove))
     }
 
+    // ── Accessibility needs bubbles ────────────────────────────
+    const handleAccessibilityKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault()
+            const trimmed = accessibilityInput.trim()
+            if (!trimmed) return
+            const current = profile?.accessibility_needs || []
+            if (!current.includes(trimmed)) {
+                handleChange('accessibility_needs', [...current, trimmed])
+            }
+            setAccessibilityInput('')
+        }
+    }
+
+    const removeAccessibility = (item) => {
+        handleChange('accessibility_needs', (profile?.accessibility_needs || []).filter((s) => s !== item))
+    }
+
     // ── Geolocation ────────────────────────────────────────────
     const handleLocationFocus = () => {
         if (!navigator.geolocation) return
-        if (profile?.location) return // already set, don't ask again
+        if (profile?.location) return
 
         navigator.geolocation.getCurrentPosition(
             async (pos) => {
@@ -132,18 +157,15 @@ function Profile() {
                         json.address?.city ||
                         json.address?.town ||
                         json.address?.village ||
-                        json.address?.county ||
-                        ''
+                        json.address?.county || ''
                     const country = json.address?.country || ''
                     const locationString = [city, country].filter(Boolean).join(', ')
                     if (locationString) handleChange('location', locationString)
                 } catch {
-                    // silently fail — user can type manually
+                    // silently fail
                 }
             },
-            () => {
-                // permission denied or error — do nothing
-            }
+            () => { /* permission denied */ }
         )
     }
 
@@ -161,8 +183,12 @@ function Profile() {
                 name: profile.name,
                 age: profile.age,
                 pronouns: profile.pronouns,
+                gender_identity: profile.gender_identity,
                 location: profile.location,
                 skill_set: profile.skill_set,
+                accessibility_needs: profile.accessibility_needs,
+                has_children: profile.has_children,
+                has_pets: profile.has_pets,
                 updated_at: new Date().toISOString(),
             })
             .eq('id', user.id)
@@ -184,6 +210,43 @@ function Profile() {
             skillMap[skill] = (skillMap[skill] || 0) + 1
         })
     })
+
+    // ── Bubble component ───────────────────────────────────────
+    const Bubble = ({ label, onRemove }) => (
+        <span
+            style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px',
+                background: '#f0e6ff',
+                color: '#6f5a91',
+                borderRadius: '999px',
+                padding: '4px 12px',
+                fontSize: '0.85rem',
+                fontWeight: 500,
+            }}
+        >
+            {label}
+            {onRemove && (
+                <button
+                    type="button"
+                    onClick={onRemove}
+                    style={{
+                        background: 'none',
+                        border: 'none',
+                        color: '#9b7cc4',
+                        cursor: 'pointer',
+                        padding: '0 2px',
+                        fontSize: '0.9rem',
+                        lineHeight: 1,
+                    }}
+                    title="Remove"
+                >
+                    ×
+                </button>
+            )}
+        </span>
+    )
 
     if (loading) {
         return (
@@ -208,7 +271,7 @@ function Profile() {
                 <Card
                     className="mb-4 text-center mx-auto"
                     style={{
-                        maxWidth: '450px',
+                        maxWidth: '500px',
                         borderRadius: '28px',
                         background: 'rgba(255,255,255,0.9)',
                         backdropFilter: 'blur(6px)',
@@ -267,6 +330,8 @@ function Profile() {
 
                     {editing ? (
                         <Form style={{ width: '100%', textAlign: 'left' }}>
+
+                            {/* Name */}
                             <Form.Group className="mb-3">
                                 <Form.Label><strong>Name</strong></Form.Label>
                                 <Form.Control
@@ -275,6 +340,7 @@ function Profile() {
                                 />
                             </Form.Group>
 
+                            {/* Age */}
                             <Form.Group className="mb-3">
                                 <Form.Label><strong>Age</strong></Form.Label>
                                 <Form.Control
@@ -287,6 +353,7 @@ function Profile() {
                                 <Form.Text className="text-muted">Must be between 0 and 100.</Form.Text>
                             </Form.Group>
 
+                            {/* Pronouns */}
                             <Form.Group className="mb-3">
                                 <Form.Label><strong>Pronouns</strong></Form.Label>
                                 <Form.Control
@@ -295,6 +362,21 @@ function Profile() {
                                 />
                             </Form.Group>
 
+                            {/* Gender Identity */}
+                            <Form.Group className="mb-3">
+                                <Form.Label><strong>Gender Identity</strong></Form.Label>
+                                <Form.Select
+                                    value={profile?.gender_identity || ''}
+                                    onChange={(e) => handleChange('gender_identity', e.target.value)}
+                                >
+                                    <option value="">Select…</option>
+                                    {GENDER_OPTIONS.map((g) => (
+                                        <option key={g} value={g}>{g}</option>
+                                    ))}
+                                </Form.Select>
+                            </Form.Group>
+
+                            {/* Location */}
                             <Form.Group className="mb-3">
                                 <Form.Label><strong>Location</strong></Form.Label>
                                 <Form.Control
@@ -308,50 +390,12 @@ function Profile() {
                                 </Form.Text>
                             </Form.Group>
 
+                            {/* Skills */}
                             <Form.Group className="mb-3">
                                 <Form.Label><strong>Skills</strong></Form.Label>
-                                {/* Skill bubbles */}
-                                <div
-                                    style={{
-                                        display: 'flex',
-                                        flexWrap: 'wrap',
-                                        gap: '6px',
-                                        marginBottom: '8px',
-                                    }}
-                                >
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '8px' }}>
                                     {(profile?.skill_set || []).map((skill) => (
-                                        <span
-                                            key={skill}
-                                            style={{
-                                                display: 'inline-flex',
-                                                alignItems: 'center',
-                                                gap: '4px',
-                                                background: '#f0e6ff',
-                                                color: '#6f5a91',
-                                                borderRadius: '999px',
-                                                padding: '4px 12px',
-                                                fontSize: '0.85rem',
-                                                fontWeight: 500,
-                                            }}
-                                        >
-                                            {skill}
-                                            <button
-                                                type="button"
-                                                onClick={() => removeSkill(skill)}
-                                                style={{
-                                                    background: 'none',
-                                                    border: 'none',
-                                                    color: '#9b7cc4',
-                                                    cursor: 'pointer',
-                                                    padding: '0 2px',
-                                                    fontSize: '0.9rem',
-                                                    lineHeight: 1,
-                                                }}
-                                                title="Remove skill"
-                                            >
-                                                ×
-                                            </button>
-                                        </span>
+                                        <Bubble key={skill} label={skill} onRemove={() => removeSkill(skill)} />
                                     ))}
                                 </div>
                                 <Form.Control
@@ -363,6 +407,43 @@ function Profile() {
                                 <Form.Text className="text-muted">Press Enter to add each skill.</Form.Text>
                             </Form.Group>
 
+                            {/* Accessibility Needs */}
+                            <Form.Group className="mb-3">
+                                <Form.Label><strong>Accessibility Needs</strong></Form.Label>
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '8px' }}>
+                                    {(profile?.accessibility_needs || []).map((item) => (
+                                        <Bubble key={item} label={item} onRemove={() => removeAccessibility(item)} />
+                                    ))}
+                                </div>
+                                <Form.Control
+                                    value={accessibilityInput}
+                                    onChange={(e) => setAccessibilityInput(e.target.value)}
+                                    onKeyDown={handleAccessibilityKeyDown}
+                                    placeholder="Type a need and press Enter"
+                                />
+                                <Form.Text className="text-muted">Press Enter to add each item.</Form.Text>
+                            </Form.Group>
+
+                            {/* Has Children */}
+                            <Form.Group className="mb-3">
+                                <Form.Check
+                                    type="checkbox"
+                                    label="I have children"
+                                    checked={profile?.has_children || false}
+                                    onChange={(e) => handleChange('has_children', e.target.checked)}
+                                />
+                            </Form.Group>
+
+                            {/* Has Pets */}
+                            <Form.Group className="mb-3">
+                                <Form.Check
+                                    type="checkbox"
+                                    label="I have pets"
+                                    checked={profile?.has_pets || false}
+                                    onChange={(e) => handleChange('has_pets', e.target.checked)}
+                                />
+                            </Form.Group>
+
                             {error && <div className="alert alert-danger py-2">{error}</div>}
                             {success && <div className="alert alert-success py-2">{success}</div>}
 
@@ -370,7 +451,14 @@ function Profile() {
                                 <Button variant="dark" onClick={handleSave} disabled={saving}>
                                     {saving ? 'Saving…' : 'Save'}
                                 </Button>
-                                <Button variant="outline-secondary" onClick={() => { setEditing(false); setSkillInput('') }}>
+                                <Button
+                                    variant="outline-secondary"
+                                    onClick={() => {
+                                        setEditing(false)
+                                        setSkillInput('')
+                                        setAccessibilityInput('')
+                                    }}
+                                >
                                     Cancel
                                 </Button>
                             </div>
@@ -384,34 +472,30 @@ function Profile() {
                             <p style={{ margin: '0.25rem 0' }}><strong>Email:</strong> {profile?.email || '—'}</p>
                             <p style={{ margin: '0.25rem 0' }}><strong>Age:</strong> {profile?.age || '—'}</p>
                             <p style={{ margin: '0.25rem 0' }}><strong>Pronouns:</strong> {profile?.pronouns || '—'}</p>
+                            <p style={{ margin: '0.25rem 0' }}><strong>Gender Identity:</strong> {profile?.gender_identity || '—'}</p>
                             <p style={{ margin: '0.25rem 0' }}><strong>Location:</strong> {profile?.location || '—'}</p>
-                            <p style={{ margin: '0.25rem 0' }}>
-                                <strong>Skills:</strong>{' '}
-                                {profile?.skill_set?.length
-                                    ? (
-                                        <span style={{ display: 'inline-flex', flexWrap: 'wrap', gap: '6px', marginTop: '4px' }}>
-                                            {profile.skill_set.map((s) => (
-                                                <span
-                                                    key={s}
-                                                    style={{
-                                                        background: '#f0e6ff',
-                                                        color: '#6f5a91',
-                                                        borderRadius: '999px',
-                                                        padding: '3px 10px',
-                                                        fontSize: '0.82rem',
-                                                        fontWeight: 500,
-                                                    }}
-                                                >
-                                                    {s}
-                                                </span>
-                                            ))}
-                                        </span>
-                                    )
-                                    : '—'
-                                }
-                            </p>
+                            <p style={{ margin: '0.25rem 0' }}><strong>Has Children:</strong> {profile?.has_children ? 'Yes' : 'No'}</p>
+                            <p style={{ margin: '0.25rem 0' }}><strong>Has Pets:</strong> {profile?.has_pets ? 'Yes' : 'No'}</p>
 
-                            <Button variant="dark" className="mt-2" onClick={() => setEditing(true)}>
+                            <div style={{ margin: '0.25rem 0', textAlign: 'left' }}>
+                                <strong>Skills:</strong>{' '}
+                                {profile?.skill_set?.length ? (
+                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '6px' }}>
+                                        {profile.skill_set.map((s) => <Bubble key={s} label={s} />)}
+                                    </div>
+                                ) : '—'}
+                            </div>
+
+                            <div style={{ margin: '0.5rem 0', textAlign: 'left' }}>
+                                <strong>Accessibility Needs:</strong>{' '}
+                                {profile?.accessibility_needs?.length ? (
+                                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '6px' }}>
+                                        {profile.accessibility_needs.map((s) => <Bubble key={s} label={s} />)}
+                                    </div>
+                                ) : '—'}
+                            </div>
+
+                            <Button variant="dark" className="mt-3" onClick={() => setEditing(true)}>
                                 Edit
                             </Button>
                         </>
